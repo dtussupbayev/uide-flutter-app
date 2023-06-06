@@ -69,7 +69,7 @@ class MainScreenWidgetState extends State<MainScreenWidget>
           physics: const NeverScrollableScrollPhysics(),
           children: [
             NotifierProvider(
-              create: () => savedHouseListModel,
+              create: () => savedHouseListModel..setupHouses(context),
               isManagingModel: false,
               child: const SavedHouseListWidget(),
             ),

@@ -4,22 +4,35 @@ import 'package:uide/domain/models/house_entity/house_entity.dart';
 import 'package:uide/navigation/main_navigation.dart';
 
 class SavedHouseListModel extends ChangeNotifier {
+  bool _isLoading = true;
   final _apiClient = ApiClient();
-  final _houses = <HouseEntity>[];
+  final _houses = <HouseEntity>[].toList();
   bool isContentEmpty = false;
   List<HouseEntity> get houses => List.unmodifiable(_houses);
+  bool get isLoading => _isLoading;
+
+  void setupHouses(BuildContext context) {
+    _isLoading = true;
+    notifyListeners();
+    _houses.clear();
+    loadHouses(context);
+    _isLoading = false;
+    notifyListeners();
+  }
 
   Future<void> loadHouses(BuildContext context) async {
-    _houses.clear();
-
-    final housesResponse = await _apiClient.myAdsResponse(context);
-    if (housesResponse != null) {
-      if (housesResponse.numberOfElements == 0) {
+    final savedHouseListResponse =
+        await _apiClient.savedHousesResponse(context);
+    if (savedHouseListResponse != null) {
+      print(savedHouseListResponse.first.id);
+      if (savedHouseListResponse.isEmpty) {
+        print('list empty');
         isContentEmpty = true;
         notifyListeners();
+        return;
       }
-      _houses.addAll(housesResponse.content ?? []);
-
+      _houses.addAll(savedHouseListResponse);
+      print(_houses);
       notifyListeners();
     }
   }
@@ -30,10 +43,5 @@ class SavedHouseListModel extends ChangeNotifier {
       MainNavigationRouteNames.houseDetails,
       arguments: id,
     );
-  }
-
-  void showedMovieAtIndex(int index, BuildContext context) {
-    if (index < _houses.length - 2) return;
-    loadHouses(context);
   }
 }

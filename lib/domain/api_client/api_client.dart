@@ -5,12 +5,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:uide/domain/data_provider/token_data_provider.dart';
 import 'package:uide/domain/models/house_details_response/house_details_response.dart';
-import 'package:uide/domain/models/house_entity/all_movie_response.dart';
+import 'package:uide/domain/models/house_entity/all_house_response.dart';
+import 'package:uide/domain/models/house_entity/house_entity.dart';
 import 'package:uide/domain/models/user_profile/user_profile.dart';
 import 'package:uide/navigation/main_navigation.dart';
 import 'package:uide/ui/widgets/app/main.dart';
 import 'package:uide/ui/widgets/auth/auth_data.dart';
-
 import '../api_endpoints.dart';
 import 'package:http/http.dart' as http;
 
@@ -74,6 +74,42 @@ class ApiClient {
     return result;
   }
 
+  Future<List<HouseEntity>?> savedHousesResponse(BuildContext context) async {
+    final token = await TokenDataProvider().getToken();
+    const path = HouseEndPoints.savedHouses;
+    final headers = {'Authorization': 'Bearer $token'};
+
+    var response = await http.get(
+      Uri.parse(ApiEndPoints.baseUrl + path),
+      headers: headers,
+    );
+    if (response.statusCode == 200) {
+      Iterable l = json.decode(utf8.decode(response.bodyBytes));
+      List<HouseEntity> savedHouses =
+          List<HouseEntity>.from(l.map((model) => HouseEntity.fromJson(model)));
+      print(savedHouses.first.description);
+      return savedHouses;
+    } else if (response.statusCode == 401) {
+      TokenDataProvider().deleteAll();
+      if (context.mounted) {
+        RestartWidget.restartApp(context);
+        Navigator.of(context).pushNamedAndRemoveUntil(
+            MainNavigationRouteNames.authScreen, (route) => false);
+      }
+      return null;
+    } else {
+      TokenDataProvider().deleteAll();
+
+      if (context.mounted) {
+        RestartWidget.restartApp(context);
+
+        Navigator.of(context).pushNamedAndRemoveUntil(
+            MainNavigationRouteNames.authScreen, (route) => false);
+      }
+      return null;
+    }
+  }
+
   Future<AllHousesResponse?> allHousesResponse(
       int page, BuildContext context) async {
     parser(dynamic json) {
@@ -83,7 +119,7 @@ class ApiClient {
     }
 
     final result = await _get(
-        'houses?cityId=${ApiParameters.cityIdAlmaty}&size=2&page=$page',
+        'houses?cityId=${ApiParameters.cityIdAstana}&size=2&page=$page',
         parser,
         context);
     return result;
@@ -192,7 +228,7 @@ class ApiClient {
   Future<http.Response> checkOtp({
     required Map<String, dynamic> body,
   }) async {
-    const path =  AuthEndPoints.checkOtp;
+    const path = AuthEndPoints.checkOtp;
     final Map<String, String> headers = {'Content-Type': 'application/json'};
 
     http.Response response = await _post(path, body, headers);
@@ -261,7 +297,7 @@ class ApiClient {
     final token = TokenDataProvider().getToken();
     const path = HouseEndPoints.savedHouses;
 
-    final Map<String, dynamic> body ={
+    final Map<String, dynamic> body = {
       'houseId': houseId,
     };
 

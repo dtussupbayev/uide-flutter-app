@@ -15,6 +15,7 @@ import 'package:uide/ui/widgets/main/profile/questions_about_screen/questions_ab
 import 'package:uide/ui/widgets/main/rommate/roommate_details/roommate_details_screen.dart';
 import 'package:uide/ui/widgets/main/house/house_details/house_details_screen.dart';
 import 'package:uide/ui/widgets/main/house/house_list/house_list_widget.dart';
+import 'package:uide/ui/widgets/main/saved/saved_house_list_model.dart';
 import 'package:uide/ui/widgets/main/saved/saved_house_list_widget.dart';
 
 import '../ui/widgets/auth/login/auth_model.dart';
@@ -70,8 +71,11 @@ class MainNavigation {
     MainNavigationRouteNames.houseList: (context) => const HouseListWidget(),
     MainNavigationRouteNames.roommateList: (context) =>
         const RoommateListWidget(),
-    MainNavigationRouteNames.savedRoomsList: (context) =>
-        const SavedHouseListWidget(),
+    MainNavigationRouteNames.savedRoomsList: (context) => NotifierProvider(
+          create: () => SavedHouseListModel()..setupHouses(context),
+          isManagingModel: false,
+          child: const SavedHouseListWidget(),
+        ),
     MainNavigationRouteNames.myAdsScreen: (context) => NotifierProvider(
           isManagingModel: false,
           create: () => MyAdsModel()..loadHouses(context),

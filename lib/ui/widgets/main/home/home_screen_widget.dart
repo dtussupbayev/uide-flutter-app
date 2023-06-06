@@ -18,7 +18,6 @@ class HomeScreenWidgetState extends State<HomeScreenWidget>
   final houseListModel = HouseListModel();
   late TabController _tabController;
 
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();

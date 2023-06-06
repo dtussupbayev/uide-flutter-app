@@ -62,21 +62,25 @@ class HousesListViewWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
+    return ListView.builder(
       padding: const EdgeInsets.only(bottom: 50),
       shrinkWrap: true,
       physics: const BouncingScrollPhysics(),
-      separatorBuilder: (context, index) => const SizedBox(height: 10),
       itemCount: model!.houses.length,
       itemBuilder: (context, index) {
         model!.showedHouseAtIndex(index, context);
         final house = model!.houses[index];
-        return SizedBox(
-          height: 350,
-          child: HouseItem(
-            house: house,
-            onTap: () => model!.onHouseTap(context, index),
-          ),
+        return Column(
+          children: [
+            SizedBox(
+              height: 350,
+              child: HouseItem(
+                house: house,
+                onTap: () => model!.onHouseTap(context, index),
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
         );
       },
     );
@@ -102,18 +106,16 @@ class ShimmerHousesListViewWidget extends StatelessWidget {
               height: 350,
               child: Padding(
                 padding: kHouseItemPadding,
-                child: Stack(children: [
-                  Container(
-                    decoration: kShimmerHouseListViewDecoration,
-                    clipBehavior: Clip.hardEdge,
-                  )
-                ]),
+                child: Container(
+                  decoration: kShimmerHouseListViewDecoration,
+                  clipBehavior: Clip.hardEdge,
+                ),
               ),
             ),
           );
         },
         separatorBuilder: (context, index) => const SizedBox(height: 10),
-        itemCount: 3);
+        itemCount: 2);
   }
 }
 
@@ -348,34 +350,6 @@ class ShimmerImageWidget extends StatelessWidget {
           color: Colors.black.withOpacity(0.1),
         ),
       ),
-    );
-  }
-}
-
-class ShimmerImage extends StatelessWidget {
-  final String imageUrl;
-
-  const ShimmerImage({super.key, required this.imageUrl});
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: Container(
-            width: double.infinity,
-            height: double.infinity,
-            color: Colors.white,
-          ),
-        ),
-        Image.network(
-          imageUrl,
-          fit: BoxFit.cover,
-        ),
-      ],
     );
   }
 }

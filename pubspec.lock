@@ -368,22 +368,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.2"
-  google_fonts:
-    dependency: "direct main"
-    description:
-      name: google_fonts
-      sha256: "6b6f10f0ce3c42f6552d1c70d2c28d764cf22bb487f50f66cca31dcd5194f4d6"
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.4"
-  gradient_textfield:
-    dependency: "direct main"
-    description:
-      name: gradient_textfield
-      sha256: df7bfc00d701af4449d93f5d26ec49d27744041b6f73c780992790fb9b8ca66c
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.1"
   graphs:
     dependency: transitive
     description:
@@ -561,7 +545,7 @@ packages:
     source: hosted
     version: "1.9.1"
   mime:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: mime
       sha256: e4ff8e8564c03f255408decd16e7899da1733852a9110a58fe6d1b817684a63e
@@ -584,30 +568,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.8.3"
-  path_provider:
-    dependency: transitive
-    description:
-      name: path_provider
-      sha256: "3087813781ab814e4157b172f1a11c46be20179fcc9bea043e0fba36bc0acaa2"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.15"
-  path_provider_android:
-    dependency: transitive
-    description:
-      name: path_provider_android
-      sha256: "2cec049d282c7f13c594b4a73976b0b4f2d7a1838a6dd5aaf7bd9719196bee86"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.27"
-  path_provider_foundation:
-    dependency: transitive
-    description:
-      name: path_provider_foundation
-      sha256: "1995d88ec2948dac43edf8fe58eb434d35d22a2940ecee1a9fefcd62beee6eb3"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.2.3"
   path_provider_linux:
     dependency: transitive
     description:
@@ -632,14 +592,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.6"
-  persistent_bottom_nav_bar:
-    dependency: "direct main"
-    description:
-      name: persistent_bottom_nav_bar
-      sha256: e2e031e3366fde01511e372a9a19d720a9b252bb456e5c8d77a30d7a4a2ddfb0
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.2"
   photo_view:
     dependency: "direct main"
     description:
@@ -853,14 +805,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.5.1"
-  theseus_navigator:
-    dependency: "direct main"
-    description:
-      name: theseus_navigator
-      sha256: "64de43a61dda087c9c07c0f92074fd39f1784b4ea376e9825fd86a88e2676da9"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.1"
   timing:
     dependency: transitive
     description:

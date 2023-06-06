@@ -174,7 +174,7 @@ class _CreateAdScreenWidgetState extends State<CreateAdScreenWidget> {
                   Row(
                     children: [
                       Expanded(
-                        child: DefaultInputTextField(
+                        child: DefaultNumberInputTextField(
                           controller: model.numberOfRoomsController,
                           hintText: 'Количество комнат',
                           keyboardType: TextInputType.number,
@@ -182,7 +182,7 @@ class _CreateAdScreenWidgetState extends State<CreateAdScreenWidget> {
                       ),
                       const SizedBox(width: 10),
                       Expanded(
-                        child: DefaultInputTextField(
+                        child: DefaultNumberInputTextField(
                           controller: model.numberOfResidentsController,
                           hintText: 'Число жителей',
                           keyboardType: TextInputType.number,

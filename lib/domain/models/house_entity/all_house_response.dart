@@ -4,7 +4,7 @@ import 'package:uide/domain/models/house_entity/house_entity.dart';
 import 'pageable.dart';
 import 'sort.dart';
 
-part 'all_movie_response.g.dart';
+part 'all_house_response.g.dart';
 
 @JsonSerializable()
 class AllHousesResponse {
@@ -35,8 +35,8 @@ class AllHousesResponse {
   });
 
   factory AllHousesResponse.fromJson(Map<String, dynamic> json) {
-    return _$AllMovieResponseFromJson(json);
+    return _$AllHousesResponseFromJson(json);
   }
 
-  Map<String, dynamic> toJson() => _$AllMovieResponseToJson(this);
+  Map<String, dynamic> toJson() => _$AllHousesResponseToJson(this);
 }

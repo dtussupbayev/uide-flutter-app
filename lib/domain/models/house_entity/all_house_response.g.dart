@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'all_movie_response.dart';
+part of 'all_house_response.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-AllHousesResponse _$AllMovieResponseFromJson(Map<String, dynamic> json) =>
+AllHousesResponse _$AllHousesResponseFromJson(Map<String, dynamic> json) =>
     AllHousesResponse(
       content: (json['content'] as List<dynamic>?)
           ?.map((e) => HouseEntity.fromJson(e as Map<String, dynamic>))
@@ -27,7 +27,7 @@ AllHousesResponse _$AllMovieResponseFromJson(Map<String, dynamic> json) =>
       empty: json['empty'] as bool?,
     );
 
-Map<String, dynamic> _$AllMovieResponseToJson(AllHousesResponse instance) =>
+Map<String, dynamic> _$AllHousesResponseToJson(AllHousesResponse instance) =>
     <String, dynamic>{
       'content': instance.content,
       'pageable': instance.pageable,

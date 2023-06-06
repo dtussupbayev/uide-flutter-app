@@ -105,9 +105,8 @@ class _MyAdsScreenWidgetState extends State<MyAdsScreenWidget>
                                 backgroundColor:
                                     ProjectColors.kDarkerMediumGreen,
                               ),
-                              onPressed: () => Navigator.of(context)
-                                  .pushNamed(MainNavigationRouteNames
-                                      .createAdScreen),
+                              onPressed: () => Navigator.of(context).pushNamed(
+                                  MainNavigationRouteNames.createAdScreen),
                               child: const Text(
                                 'Создать',
                                 style: TextStyle(fontSize: 16),
@@ -142,41 +141,33 @@ class _MyAdsScreenWidgetState extends State<MyAdsScreenWidget>
                                           height: 350,
                                           child: Padding(
                                             padding: kHouseItemPadding,
-                                            child: Stack(children: [
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                  color: ProjectColors
-                                                      .kTransparent,
-                                                  border: Border.all(
-                                                      color: ProjectColors
-                                                          .kBlack
-                                                          .withOpacity(
-                                                              0.1)),
-                                                  borderRadius:
-                                                      const BorderRadius
-                                                              .all(
-                                                          Radius.circular(
-                                                              30)),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: ProjectColors
-                                                          .kBlack
-                                                          .withOpacity(0.2),
-                                                      blurRadius: 8,
-                                                      offset: const Offset(
-                                                          0, 2),
-                                                    ),
-                                                  ],
-                                                ),
-                                                clipBehavior: Clip.hardEdge,
-                                              )
-                                            ]),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    ProjectColors.kTransparent,
+                                                border: Border.all(
+                                                    color: ProjectColors.kBlack
+                                                        .withOpacity(0.1)),
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(30)),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: ProjectColors.kBlack
+                                                        .withOpacity(0.2),
+                                                    blurRadius: 8,
+                                                    offset: const Offset(0, 2),
+                                                  ),
+                                                ],
+                                              ),
+                                              clipBehavior: Clip.hardEdge,
+                                            ),
                                           ),
                                         ),
                                       ),
                                   separatorBuilder: (context, index) =>
                                       const SizedBox(height: 10),
-                                  itemCount: 3)
+                                  itemCount: 2)
                               : ListView.separated(
                                   padding: EdgeInsets.zero,
                                   shrinkWrap: true,

@@ -124,23 +124,19 @@ class _UserInfo extends StatelessWidget {
     return Container(
       color: ProjectColors.kTransparent,
       width: double.infinity,
-      child: const Stack(
-        children: [
-          Center(
-            child: Column(
-              children: [
-                SizedBox(height: 20),
-                _AvatarWidget(),
-                SizedBox(height: 30),
-                _UserNameWidget(),
-                SizedBox(height: 10),
-                _UserPhoneWidget(),
-                SizedBox(height: 10),
-                _UserNickWidget(),
-              ],
-            ),
-          ),
-        ],
+      child: const Center(
+        child: Column(
+          children: [
+            SizedBox(height: 20),
+            _AvatarWidget(),
+            SizedBox(height: 30),
+            _UserNameWidget(),
+            SizedBox(height: 10),
+            _UserPhoneWidget(),
+            SizedBox(height: 10),
+            _UserNickWidget(),
+          ],
+        ),
       ),
     );
   }

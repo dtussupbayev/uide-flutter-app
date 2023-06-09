@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:uide/domain/api_client/api_client.dart';
 import 'package:uide/domain/models/house_details_response/house_details_response.dart';
 import 'package:uide/domain/models/house_details_response/photo.dart';
+import 'package:uide/domain/models/house_entity/house_entity.dart';
 
 class HouseDetailsModel extends ChangeNotifier {
   final _apiClient = ApiClient();
 
   final String houseId;
   HouseDetailsResponse? _houseDetails;
+  bool? _isSaved;
+
+  bool? get isSaved => _isSaved;
 
   HouseDetailsResponse? get houseDetails => _houseDetails;
 
@@ -15,7 +19,44 @@ class HouseDetailsModel extends ChangeNotifier {
 
   Future<void> loadDetails(BuildContext context) async {
     _houseDetails = await _apiClient.houseDetails(houseId, context);
+    await checkIsSaved(houseId, context);
     notifyListeners();
+  }
+
+  Future<void> checkIsSaved(String houseId, BuildContext context) async {
+    List<HouseEntity>? savedHousesList =
+        await _apiClient.savedHousesResponse(context);
+
+    if (savedHousesList!.where((element) => element.id == houseId).isNotEmpty) {
+      _isSaved = true;
+      notifyListeners();
+      print('isSaved=truee');
+
+      return;
+    } else {
+      _isSaved = false;
+      notifyListeners();
+      print('isSaved=falsee');
+    }
+  }
+
+  Future<void> addToSaved(String houseId, BuildContext context) async {
+    _apiClient.addToSaved(houseId: houseId);
+
+    _isSaved = true;
+    notifyListeners();
+    print('isSaved=true');
+  }
+
+  Future<void> deleteFromSaved(String houseId, BuildContext context) async {
+    _apiClient.deleteFromSaved(
+      houseId: houseId,
+      context: context,
+    );
+    _isSaved = false;
+
+    notifyListeners();
+    print('isSaved=false');
   }
 
   String loadImageUrl(List<Photo>? image) {

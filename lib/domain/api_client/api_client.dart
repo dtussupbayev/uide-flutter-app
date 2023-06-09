@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:uide/domain/data_provider/token_data_provider.dart';
 import 'package:uide/domain/models/house_details_response/house_details_response.dart';
@@ -31,34 +29,56 @@ class ApiClient {
     final token = await TokenDataProvider().getToken();
 
     var headers = {'Authorization': 'Bearer $token'};
-    final response = await http.get(
-      Uri.parse(ApiEndPoints.baseUrl + path),
-      headers: headers,
-    );
-    print(response.body);
-    if (response.statusCode == 200) {
-      final dynamic json = jsonDecode(utf8.decode(response.bodyBytes));
-      final result = parser(json);
-      return result;
-    } else if (response.statusCode == 401) {
-      TokenDataProvider().deleteAll();
-      if (context.mounted) {
-        RestartWidget.restartApp(context);
-        Navigator.of(context).pushNamedAndRemoveUntil(
-            MainNavigationRouteNames.authScreen, (route) => false);
-      }
-      return null;
-    } else {
-      TokenDataProvider().deleteAll();
+    try {
+      final response = await http.get(
+        Uri.parse(ApiEndPoints.baseUrl + path),
+        headers: headers,
+      );
+      if (response.statusCode == 200) {
+        final dynamic json = jsonDecode(utf8.decode(response.bodyBytes));
+        final result = parser(json);
+        return result;
+      } else if (response.statusCode == 401) {
+        TokenDataProvider().deleteAll();
+        if (context.mounted) {
+          RestartWidget.restartApp(context);
+          Navigator.of(context).pushNamedAndRemoveUntil(
+              MainNavigationRouteNames.authScreen, (route) => false);
+        }
+        return null;
+      } else {
+        TokenDataProvider().deleteAll();
 
-      if (context.mounted) {
-        RestartWidget.restartApp(context);
+        if (context.mounted) {
+          RestartWidget.restartApp(context);
 
-        Navigator.of(context).pushNamedAndRemoveUntil(
-            MainNavigationRouteNames.authScreen, (route) => false);
+          Navigator.of(context).pushNamedAndRemoveUntil(
+              MainNavigationRouteNames.authScreen, (route) => false);
+        }
+        return null;
       }
-      return null;
+    } catch (e) {
+      if (context.mounted) {
+        (
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Connection Error'),
+              content: const Text('The connection was aborted.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
     }
+    return null;
   }
 
   Future<AllHousesResponse?> adminHousesResponse(
@@ -79,35 +99,57 @@ class ApiClient {
     const path = HouseEndPoints.savedHouses;
     final headers = {'Authorization': 'Bearer $token'};
 
-    var response = await http.get(
-      Uri.parse(ApiEndPoints.baseUrl + path),
-      headers: headers,
-    );
-    if (response.statusCode == 200) {
-      Iterable l = json.decode(utf8.decode(response.bodyBytes));
-      List<HouseEntity> savedHouses =
-          List<HouseEntity>.from(l.map((model) => HouseEntity.fromJson(model)));
-      print(savedHouses.first.description);
-      return savedHouses;
-    } else if (response.statusCode == 401) {
-      TokenDataProvider().deleteAll();
-      if (context.mounted) {
-        RestartWidget.restartApp(context);
-        Navigator.of(context).pushNamedAndRemoveUntil(
-            MainNavigationRouteNames.authScreen, (route) => false);
-      }
-      return null;
-    } else {
-      TokenDataProvider().deleteAll();
+    try {
+      var response = await http.get(
+        Uri.parse(ApiEndPoints.baseUrl + path),
+        headers: headers,
+      );
+      if (response.statusCode == 200) {
+        Iterable l = json.decode(utf8.decode(response.bodyBytes));
+        List<HouseEntity> savedHouses = List<HouseEntity>.from(
+            l.map((model) => HouseEntity.fromJson(model)));
+        return savedHouses;
+      } else if (response.statusCode == 401) {
+        TokenDataProvider().deleteAll();
+        if (context.mounted) {
+          RestartWidget.restartApp(context);
+          Navigator.of(context).pushNamedAndRemoveUntil(
+              MainNavigationRouteNames.authScreen, (route) => false);
+        }
+        return null;
+      } else {
+        TokenDataProvider().deleteAll();
 
-      if (context.mounted) {
-        RestartWidget.restartApp(context);
+        if (context.mounted) {
+          RestartWidget.restartApp(context);
 
-        Navigator.of(context).pushNamedAndRemoveUntil(
-            MainNavigationRouteNames.authScreen, (route) => false);
+          Navigator.of(context).pushNamedAndRemoveUntil(
+              MainNavigationRouteNames.authScreen, (route) => false);
+        }
+        return null;
       }
-      return null;
+    } catch (e) {
+      if (context.mounted) {
+        (
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Connection Error'),
+              content: const Text('The connection was aborted.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
     }
+    return null;
   }
 
   Future<AllHousesResponse?> allHousesResponse(
@@ -174,6 +216,7 @@ class ApiClient {
       body: jsonEncode(body),
       headers: headers,
     );
+    print(response.request);
 
     return response;
   }
@@ -291,10 +334,12 @@ class ApiClient {
     }
   }
 
-  Future<String> markAsSaved({
-    required int houseId,
+  Future<http.Response> addToSaved({
+    required String houseId,
   }) async {
-    final token = TokenDataProvider().getToken();
+    final token = await TokenDataProvider().getToken();
+    print(token);
+
     const path = HouseEndPoints.savedHouses;
 
     final Map<String, dynamic> body = {
@@ -305,24 +350,16 @@ class ApiClient {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token'
     };
+    print(headers);
 
     http.Response response = await _post(
       path,
       body,
       headers,
     );
-
-    if (response.statusCode == 200) {
-      final responseBody = response.body;
-      Map<String, dynamic> jsonData = json.decode(responseBody);
-      String id = jsonData['id'];
-      print(id);
-      print(jsonData);
-      return id;
-    } else {
-      print(response.reasonPhrase);
-      return '0';
-    }
+    print('added');
+    print(response.body);
+    return response;
   }
 
   Future<http.Response?> _delete<T>(
@@ -357,13 +394,13 @@ class ApiClient {
     final http.Response? result = await _delete('houses/$houseId', context);
     return result;
   }
-}
 
-extension HttpClientResponseJsonDecode on HttpClientResponse {
-  Future<dynamic> jsonDecode() async {
-    return transform(utf8.decoder).toList().then((value) {
-      final result = value.join();
-      return result;
-    }).then<dynamic>((v) => json.decode(v));
+  Future<http.Response?> deleteFromSaved({
+    required String houseId,
+    required BuildContext context,
+  }) async {
+    final http.Response? result =
+        await _delete('houses/saved/$houseId', context);
+    return result;
   }
 }

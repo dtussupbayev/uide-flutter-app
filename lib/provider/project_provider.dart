@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
-class NotifierProvider<Model extends ChangeNotifier> extends StatefulWidget {
+class ProjectNotifierProvider<Model extends ChangeNotifier>
+    extends StatefulWidget {
   final Widget child;
   final bool isManagingModel;
   final Model Function() create;
 
-  const NotifierProvider({
+  const ProjectNotifierProvider({
     Key? key,
     required this.child,
     this.isManagingModel = true,
@@ -13,8 +14,8 @@ class NotifierProvider<Model extends ChangeNotifier> extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _NotifierProviderState<Model> createState() =>
-      _NotifierProviderState<Model>();
+  State<ProjectNotifierProvider<Model>> createState() =>
+      _ProjectNotifierProviderState<Model>();
 
   static Model? watch<Model extends ChangeNotifier>(BuildContext context) {
     return context
@@ -31,8 +32,8 @@ class NotifierProvider<Model extends ChangeNotifier> extends StatefulWidget {
   }
 }
 
-class _NotifierProviderState<Model extends ChangeNotifier>
-    extends State<NotifierProvider<Model>> {
+class _ProjectNotifierProviderState<Model extends ChangeNotifier>
+    extends State<ProjectNotifierProvider<Model>> {
   late final Model _model;
 
   @override
@@ -73,10 +74,10 @@ class _InheritedNotifierProvider<Model extends ChangeNotifier>
         );
 }
 
-class Provider<Model> extends InheritedWidget {
+class ProjectProvider<Model> extends InheritedWidget {
   final Model model;
 
-  const Provider({
+  const ProjectProvider({
     Key? key,
     required this.model,
     required Widget child,
@@ -86,18 +87,18 @@ class Provider<Model> extends InheritedWidget {
         );
 
   static Model? watch<Model>(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<Provider<Model>>()?.model;
+    return context.dependOnInheritedWidgetOfExactType<ProjectProvider<Model>>()?.model;
   }
 
   static Model? read<Model>(BuildContext context) {
     final widget = context
-        .getElementForInheritedWidgetOfExactType<Provider<Model>>()
+        .getElementForInheritedWidgetOfExactType<ProjectProvider<Model>>()
         ?.widget;
-    return widget is Provider<Model> ? widget.model : null;
+    return widget is ProjectProvider<Model> ? widget.model : null;
   }
 
   @override
-  bool updateShouldNotify(Provider oldWidget) {
+  bool updateShouldNotify(ProjectProvider oldWidget) {
     return model != oldWidget.model;
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:uide/domain/models/house_details_response/house_details_response.dart';
-import 'package:uide/provider/provider.dart';
+import 'package:uide/provider/project_provider.dart';
 import 'package:uide/ui/theme/project_colors.dart';
 import 'package:uide/ui/widgets/main/ads/my_ads_details/my_ads_details_content.dart';
 import 'package:uide/ui/widgets/main/ads/my_ads_details/my_ads_details_model.dart';
@@ -23,12 +23,13 @@ class _MyAdsDetailsScreenState extends State<MyAdsDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    NotifierProvider.read<MyAdsDetailsModel>(context)?.loadDetails(context);
+    ProjectNotifierProvider.read<MyAdsDetailsModel>(context)
+        ?.loadDetails(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.watch<MyAdsDetailsModel>(context);
+    final model = ProjectNotifierProvider.watch<MyAdsDetailsModel>(context);
     final houseDetails = model?.houseDetails;
 
     return DecoratedBox(

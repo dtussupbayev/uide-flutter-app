@@ -7,7 +7,7 @@ import 'package:uide/ui/widgets/auth/register/check_otp/check_otp_model.dart';
 import 'package:uide/utils/header_widget.dart';
 import 'package:uide/utils/have_an_account_sign_in.dart';
 
-import '../../../../../provider/provider.dart';
+import '../../../../../provider/project_provider.dart';
 import '../../../../theme/project_styles.dart';
 
 class CheckOtpScreen extends StatefulWidget {
@@ -20,7 +20,7 @@ class CheckOtpScreen extends StatefulWidget {
 class _CheckOtpScreenState extends State<CheckOtpScreen> {
   @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.watch<CheckOtpModel>(context);
+    final model = ProjectNotifierProvider.watch<CheckOtpModel>(context);
     final arguments =
         ModalRoute.of(context)!.settings.arguments as UserAuthData;
     const pageColor = ProjectColors.kDarkerLightGreen;

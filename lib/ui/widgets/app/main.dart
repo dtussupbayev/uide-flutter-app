@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:provider/provider.dart';
 import 'package:uide/navigation/main_navigation.dart';
+import 'package:uide/provider/connectivity_provider.dart';
 import 'package:uide/ui/theme/project_colors.dart';
 import 'main_app_model.dart';
 
@@ -32,22 +34,25 @@ class MainApp extends StatelessWidget {
   final MainAppModel model;
   static final mainNavigation = MainNavigation();
   const MainApp({
-    super.key,
+    Key? key,
     required this.model,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'Montserrat',
-        appBarTheme: const AppBarTheme(
-          systemOverlayStyle: SystemUiOverlayStyle.light,
+    return ChangeNotifierProvider(
+      create: (_) => ConnectivityProvider(),
+      child: GetMaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          fontFamily: 'Montserrat',
+          appBarTheme: const AppBarTheme(
+            systemOverlayStyle: SystemUiOverlayStyle.light,
+          ),
         ),
+        initialRoute: mainNavigation.initialRoute(model.isAuth),
+        routes: mainNavigation.routes,
       ),
-      initialRoute: mainNavigation.initialRoute(model.isAuth),
-      routes: mainNavigation.routes,
     );
   }
 }
@@ -59,7 +64,7 @@ class MyArguments {
 }
 
 class RestartWidget extends StatefulWidget {
-  const RestartWidget({super.key, required this.child});
+  const RestartWidget({super.key,required this.child});
 
   final Widget child;
 

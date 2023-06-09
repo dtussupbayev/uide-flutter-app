@@ -32,7 +32,7 @@ class MyAdsModel extends ChangeNotifier {
     );
   }
 
-  void showedMovieAtIndex(int index, BuildContext context) {
+  void showedHouseAtIndex(int index, BuildContext context) {
     if (index < _houses.length - 2) return;
     loadHouses(context);
   }

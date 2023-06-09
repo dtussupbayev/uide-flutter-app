@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:uide/provider/provider.dart';
+import 'package:uide/provider/project_provider.dart';
 import 'package:uide/ui/theme/project_styles.dart';
 import 'package:uide/ui/theme/project_colors.dart';
 import 'package:uide/ui/widgets/main/ads/create_ad_screen/create_ad_screen_model.dart';
@@ -17,7 +17,7 @@ class CreateAdScreenWidget extends StatefulWidget {
 class _CreateAdScreenWidgetState extends State<CreateAdScreenWidget> {
   @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.watch<CreateAdScreenModel>(context);
+    final model = ProjectNotifierProvider.watch<CreateAdScreenModel>(context);
     String? selectedCiyValue;
     String? selectedHouseValue;
 
@@ -38,8 +38,7 @@ class _CreateAdScreenWidgetState extends State<CreateAdScreenWidget> {
                   Row(
                     children: [
                       ChooseTypeOfHouseWidget(
-                          selectedHouseValue: selectedHouseValue,
-                          model: model),
+                          selectedHouseValue: selectedHouseValue, model: model),
                       const SizedBox(width: 10),
                       ChooseCityWidget(
                           selectedCiyValue: selectedCiyValue, model: model),
@@ -212,7 +211,7 @@ class _CreateAdScreenWidgetState extends State<CreateAdScreenWidget> {
   }
 
   Widget buildRoomButton(int roomNumber) {
-    final model = NotifierProvider.watch<CreateAdScreenModel>(context);
+    final model = ProjectNotifierProvider.watch<CreateAdScreenModel>(context);
     var roomButtonStyle = ElevatedButton.styleFrom(
       backgroundColor: model!.selectedRoomIndex == roomNumber
           ? ProjectColors.kDarkerLightGreen

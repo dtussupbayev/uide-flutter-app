@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:uide/provider/provider.dart';
+import 'package:uide/provider/project_provider.dart';
 import 'package:uide/ui/widgets/auth/register/check_otp/check_otp_model.dart';
 import 'package:uide/ui/widgets/auth/register/create_account/create_account_model.dart';
 import 'package:uide/ui/widgets/auth/register/create_password/create_password_screen.dart';
@@ -17,6 +17,7 @@ import 'package:uide/ui/widgets/main/house/house_details/house_details_screen.da
 import 'package:uide/ui/widgets/main/house/house_list/house_list_widget.dart';
 import 'package:uide/ui/widgets/main/saved/saved_house_list_model.dart';
 import 'package:uide/ui/widgets/main/saved/saved_house_list_widget.dart';
+import 'package:uide/utils/connectivity_check_widget.dart';
 
 import '../ui/widgets/auth/login/auth_model.dart';
 import '../ui/widgets/auth/login/auth_screen_widget.dart';
@@ -50,38 +51,47 @@ class MainNavigation {
       : MainNavigationRouteNames.authScreen;
 
   final routes = <String, Widget Function(BuildContext)>{
-    MainNavigationRouteNames.authScreen: (context) => NotifierProvider(
+    MainNavigationRouteNames.authScreen: (context) => ProjectNotifierProvider(
           create: () => AuthModel(),
           child: const AuthScreenWidget(),
         ),
-    MainNavigationRouteNames.createAccountScreen: (context) => NotifierProvider(
+    MainNavigationRouteNames.createAccountScreen: (context) =>
+        ProjectNotifierProvider(
           create: () => CreateAccountModel(),
           child: const CreateAccountScreen(),
         ),
-    MainNavigationRouteNames.otpFormScreen: (context) => NotifierProvider(
+    MainNavigationRouteNames.otpFormScreen: (context) =>
+        ProjectNotifierProvider(
           create: () => CheckOtpModel(),
           child: const CheckOtpScreen(),
         ),
     MainNavigationRouteNames.createPasswordScreen: (context) =>
-        NotifierProvider(
+        ProjectNotifierProvider(
           create: () => CreatePasswordModel(),
           child: const CreatePasswordScreenWidget(),
         ),
-    MainNavigationRouteNames.mainScreen: (context) => const MainScreenWidget(),
+    MainNavigationRouteNames.mainScreen: (context) =>
+        const ConnectivityCheckWidget(
+          connectedWidget: MainScreenWidget(),
+        ),
     MainNavigationRouteNames.houseList: (context) => const HouseListWidget(),
     MainNavigationRouteNames.roommateList: (context) =>
         const RoommateListWidget(),
-    MainNavigationRouteNames.savedRoomsList: (context) => NotifierProvider(
-          create: () => SavedHouseListModel()..setupHouses(context),
-          isManagingModel: false,
-          child: const SavedHouseListWidget(),
+    MainNavigationRouteNames.savedRoomsList: (context) =>
+        ConnectivityCheckWidget(
+          connectedWidget: ProjectNotifierProvider(
+            create: () => SavedHouseListModel()..setupHouses(context),
+            isManagingModel: false,
+            child: const SavedHouseListWidget(),
+          ),
         ),
-    MainNavigationRouteNames.myAdsScreen: (context) => NotifierProvider(
+    MainNavigationRouteNames.myAdsScreen: (context) => ProjectNotifierProvider(
           isManagingModel: false,
           create: () => MyAdsModel()..loadHouses(context),
           child: const MyAdsScreenWidget(),
         ),
-    MainNavigationRouteNames.createAdScreen: (context) => NotifierProvider(
+    MainNavigationRouteNames.createAdScreen: (context) =>
+        ProjectNotifierProvider(
           create: () => CreateAdScreenModel(),
           child: const CreateAdScreenWidget(),
         ),
@@ -93,9 +103,9 @@ class MainNavigation {
       final arguments = ModalRoute.of(context)?.settings.arguments;
 
       final houseId = arguments.toString();
-      return NotifierProvider(
+      return ProjectNotifierProvider(
         isManagingModel: false,
-        create: () => HouseDetailsModel(houseId),
+        create: () => HouseDetailsModel(houseId)..loadDetails(context),
         child: HouseDetailsScreen(
           houseId: houseId,
         ),
@@ -106,7 +116,7 @@ class MainNavigation {
       final arguments = ModalRoute.of(context)?.settings.arguments;
 
       final houseId = arguments.toString();
-      return NotifierProvider(
+      return ProjectNotifierProvider(
         isManagingModel: false,
         create: () => MyAdsDetailsModel(houseId),
         child: MyAdsDetailsScreen(

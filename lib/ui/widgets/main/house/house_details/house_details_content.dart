@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:uide/provider/provider.dart';
+import 'package:uide/provider/project_provider.dart';
 import 'package:uide/ui/theme/project_colors.dart';
 import 'package:uide/ui/widgets/main/house/house_details/house_details_model.dart';
 
@@ -13,7 +13,7 @@ class HouseDetailsContent extends StatefulWidget {
 class HouseDetailsContentState extends State<HouseDetailsContent> {
   @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.watch<HouseDetailsModel>(context);
+    final model = ProjectNotifierProvider.watch<HouseDetailsModel>(context);
     final houseDetails = model?.houseDetails;
 
     return Expanded(

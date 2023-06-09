@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:uide/domain/api_client/api_client.dart';
 import 'package:uide/domain/models/house_entity/house_entity.dart';
@@ -8,12 +9,15 @@ class HouseListModel extends ChangeNotifier {
   bool _isLoading = true;
   final _apiClient = ApiClient();
   final _houses = <HouseEntity>[];
+  final _savedHouses = <HouseEntity>[];
   late int _currentPage;
   late int _totalPage;
   var _isLoadingInProgres = false;
   bool isContentEmpty = false;
   List<HouseEntity> get houses => List.unmodifiable(_houses.toList());
+  List<HouseEntity> get savedHouses => List.unmodifiable(_savedHouses.toList());
   bool get isLoading => _isLoading;
+  bool isConnected = true;
 
   void setupHouses(BuildContext context) {
     _isLoading = true;
@@ -21,6 +25,7 @@ class HouseListModel extends ChangeNotifier {
     _currentPage = -1;
     _totalPage = 1;
     _houses.clear();
+    checkConnectivity();
     _loadHouses(context);
     _isLoading = false;
     notifyListeners();
@@ -52,10 +57,26 @@ class HouseListModel extends ChangeNotifier {
     }
   }
 
+  Future<void> loadSavedHouses(BuildContext context) async {
+    final savedHouseListResponse =
+        await _apiClient.savedHousesResponse(context);
+    if (savedHouseListResponse != null) {
+      if (savedHouseListResponse.isEmpty) {
+        isContentEmpty = true;
+        notifyListeners();
+        return;
+      }
+      _houses.addAll(savedHouseListResponse);
+      notifyListeners();
+    }
+  }
+
   void showedHouseAtIndex(int index, BuildContext context) {
     if (index < _houses.length - 1) return;
     _loadHouses(context);
   }
+
+  void checkHouseAtIndedInSaved(int index, BuildContext context) {}
 
   void onHouseTap(BuildContext context, int index) {
     final id = _houses.toList()[index].id;
@@ -63,6 +84,11 @@ class HouseListModel extends ChangeNotifier {
       MainNavigationRouteNames.houseDetails,
       arguments: id,
     );
+  }
+
+  Future<void> checkConnectivity() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    isConnected = connectivityResult != ConnectivityResult.none;
   }
 
   String loadImageUrl(List<Photo>? image) {

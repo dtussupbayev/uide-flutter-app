@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uide/navigation/main_navigation.dart';
-import 'package:uide/provider/provider.dart';
+import 'package:uide/provider/project_provider.dart';
 import 'package:uide/ui/widgets/auth/auth_data.dart';
 import 'package:uide/ui/widgets/auth/register/create_password/create_password_model.dart';
 import 'package:uide/utils/header_widget.dart';
@@ -55,7 +55,7 @@ class _CreatePasswordScreenWidgetState
   Widget build(BuildContext context) {
     final arguments =
         ModalRoute.of(context)?.settings.arguments as UserAuthData;
-    final model = NotifierProvider.watch<CreatePasswordModel>(context);
+    final model = ProjectNotifierProvider.watch<CreatePasswordModel>(context);
 
     const pageColor = ProjectColors.kDarkerLightGreen;
 

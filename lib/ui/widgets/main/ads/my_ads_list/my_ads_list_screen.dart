@@ -8,7 +8,7 @@ import 'package:uide/ui/theme/project_colors.dart';
 import 'package:uide/ui/theme/project_styles.dart';
 import 'package:uide/ui/widgets/main/ads/my_ads_list/my_ads_list_model.dart';
 
-import '../../../../../provider/provider.dart';
+import '../../../../../provider/project_provider.dart';
 import '../../../../../utils/search_bar.dart';
 
 class MyAdsScreenWidget extends StatefulWidget {
@@ -37,7 +37,7 @@ class _MyAdsScreenWidgetState extends State<MyAdsScreenWidget>
 
   @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.watch<MyAdsModel>(context);
+    final model = ProjectNotifierProvider.watch<MyAdsModel>(context);
 
     return WillPopScope(
       onWillPop: _onBackPressed,

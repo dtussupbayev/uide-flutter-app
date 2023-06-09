@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:uide/provider/provider.dart';
+import 'package:uide/provider/project_provider.dart';
 import 'package:uide/ui/theme/project_colors.dart';
-import 'package:uide/ui/widgets/main/home/home_screen_model.dart';
 import 'package:uide/ui/widgets/main/house/house_list/house_list_model.dart';
 import 'package:uide/ui/widgets/main/rommate/roommate_list/roommate_list.dart';
 import 'package:uide/ui/widgets/main/house/house_list/house_list_widget.dart';
+import 'package:uide/utils/connectivity_check_widget.dart';
 
 class HomeScreenWidget extends StatefulWidget {
-  const HomeScreenWidget({super.key});
+  const HomeScreenWidget({
+    Key? key,
+  }) : super(key: key);
 
   @override
   HomeScreenWidgetState createState() => HomeScreenWidgetState();
@@ -19,12 +21,9 @@ class HomeScreenWidgetState extends State<HomeScreenWidget>
   late TabController _tabController;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
+  void initState() {
+    super.initState();
     _tabController = TabController(length: 2, vsync: this);
-
-    houseListModel.setupHouses(context);
   }
 
   @override
@@ -35,8 +34,6 @@ class HomeScreenWidgetState extends State<HomeScreenWidget>
 
   @override
   Widget build(BuildContext context) {
-    // ignore: unused_local_variable
-    final model = NotifierProvider.read<HomeScreenModel>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: ProjectColors.kMediumGreen,
@@ -66,17 +63,18 @@ class HomeScreenWidgetState extends State<HomeScreenWidget>
           ),
         ),
       ),
-      body: TabBarView(
+      body: ConnectivityCheckWidget(
+          connectedWidget: TabBarView(
         controller: _tabController,
         children: [
-          NotifierProvider(
-            create: () => houseListModel,
+          ProjectNotifierProvider(
+            create: () => houseListModel..setupHouses(context),
             isManagingModel: false,
             child: const HouseListWidget(),
           ),
           const RoommateListWidget(),
         ],
-      ),
+      )),
     );
   }
 }

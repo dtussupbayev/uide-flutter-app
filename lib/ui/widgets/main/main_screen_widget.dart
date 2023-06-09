@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:uide/domain/api_client/api_client.dart';
-import 'package:uide/domain/data_provider/token_data_provider.dart';
-import 'package:uide/provider/provider.dart';
+import 'package:uide/provider/project_provider.dart';
 import 'package:uide/ui/theme/project_colors.dart';
 import 'package:uide/ui/widgets/main/home/home_screen_widget.dart';
-import 'package:uide/ui/widgets/main/house/house_list/house_list_model.dart';
 import 'package:uide/ui/widgets/main/saved/saved_house_list_model.dart';
 import 'package:uide/ui/widgets/main/saved/saved_house_list_widget.dart';
 import 'package:uide/ui/widgets/main/profile/profile_screen_widget.dart';
+import 'package:uide/utils/connectivity_check_widget.dart';
 
 import '../../theme/project_styles.dart';
 
@@ -20,7 +18,6 @@ class MainScreenWidget extends StatefulWidget {
 
 class MainScreenWidgetState extends State<MainScreenWidget>
     with AutomaticKeepAliveClientMixin {
-  final houseListModel = HouseListModel();
   final savedHouseListModel = SavedHouseListModel();
 
   int _selectedPageIndex = 1;
@@ -30,19 +27,6 @@ class MainScreenWidgetState extends State<MainScreenWidget>
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _selectedPageIndex);
-    loadData();
-  }
-
-  Future<void> loadData() async {
-    // Simulating async operation
-    final email = await TokenDataProvider().getEmail();
-    final password = await TokenDataProvider().getPassword();
-    if (email != null && password != null) {
-      ApiClient().auth(
-        email: await TokenDataProvider().getEmail() as String,
-        password: await TokenDataProvider().getPassword() as String,
-      );
-    }
   }
 
   @override
@@ -68,17 +52,19 @@ class MainScreenWidgetState extends State<MainScreenWidget>
           controller: _pageController,
           physics: const NeverScrollableScrollPhysics(),
           children: [
-            NotifierProvider(
-              create: () => savedHouseListModel..setupHouses(context),
-              isManagingModel: false,
-              child: const SavedHouseListWidget(),
+            ConnectivityCheckWidget(
+              connectedWidget: ProjectNotifierProvider(
+                create: () => SavedHouseListModel()..setupHouses(context),
+                isManagingModel: false,
+                child: const SavedHouseListWidget(),
+              ),
             ),
             const HomeScreenWidget(),
             const UserProfileWidget(),
           ],
         ),
       ),
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       bottomNavigationBar: Align(
         alignment: Alignment.bottomCenter,
         child: ClipRRect(

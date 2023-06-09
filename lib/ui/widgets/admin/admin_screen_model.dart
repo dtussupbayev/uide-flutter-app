@@ -4,7 +4,7 @@ import 'package:uide/domain/models/house_entity/house_entity.dart';
 import 'package:uide/navigation/main_navigation.dart';
 
 class AdminScreenModel extends ChangeNotifier {
-  bool _isLoading = true;
+  final bool _isLoading = true;
   final _apiClient = ApiClient();
   final _houses = <HouseEntity>[];
   late int _currentPage;

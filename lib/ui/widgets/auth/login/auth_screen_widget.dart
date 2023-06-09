@@ -1,7 +1,7 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:uide/navigation/main_navigation.dart';
-import 'package:uide/provider/provider.dart';
+import 'package:uide/provider/project_provider.dart';
 import 'package:uide/ui/theme/project_colors.dart';
 
 import '../../../theme/project_styles.dart';
@@ -20,7 +20,7 @@ class _AuthScreenWidgetState extends State<AuthScreenWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.watch<AuthModel>(context);
+    final model = ProjectNotifierProvider.watch<AuthModel>(context);
     const pageColor = ProjectColors.kLightGreen;
 
     return Scaffold(
@@ -174,7 +174,7 @@ class _AuthButtonWidget extends StatefulWidget {
 class _AuthButtonWidgetState extends State<_AuthButtonWidget> {
   @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.watch<AuthModel>(context);
+    final model = ProjectNotifierProvider.watch<AuthModel>(context);
     onPressed() {
       print('pressed');
       if (widget.formKey.currentState!.validate()) {

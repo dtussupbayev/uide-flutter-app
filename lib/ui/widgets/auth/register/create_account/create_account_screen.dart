@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:email_validator/email_validator.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:uide/provider/provider.dart';
+import 'package:uide/provider/project_provider.dart';
 import 'package:uide/ui/theme/project_colors.dart';
 import 'package:uide/ui/widgets/auth/register/create_account/create_account_model.dart';
 import 'package:uide/utils/have_an_account_sign_in.dart';
@@ -23,7 +23,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.watch<CreateAccountModel>(context);
+    final model = ProjectNotifierProvider.watch<CreateAccountModel>(context);
     const pageColor = ProjectColors.kLightGreen;
     return Scaffold(
       resizeToAvoidBottomInset: false,

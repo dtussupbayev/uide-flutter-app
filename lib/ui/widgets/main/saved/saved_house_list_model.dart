@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:uide/domain/api_client/api_client.dart';
 import 'package:uide/domain/models/house_entity/house_entity.dart';
@@ -8,6 +9,9 @@ class SavedHouseListModel extends ChangeNotifier {
   final _apiClient = ApiClient();
   final _houses = <HouseEntity>[].toList();
   bool isContentEmpty = false;
+  bool result = false;
+  ConnectivityResult? connectivityResult;
+
   List<HouseEntity> get houses => List.unmodifiable(_houses);
   bool get isLoading => _isLoading;
 
@@ -15,6 +19,10 @@ class SavedHouseListModel extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     _houses.clear();
+    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+      connectivityResult = result;
+      notifyListeners();
+    });
     loadHouses(context);
     _isLoading = false;
     notifyListeners();
@@ -23,25 +31,30 @@ class SavedHouseListModel extends ChangeNotifier {
   Future<void> loadHouses(BuildContext context) async {
     final savedHouseListResponse =
         await _apiClient.savedHousesResponse(context);
+    print(savedHouseListResponse);
     if (savedHouseListResponse != null) {
-      print(savedHouseListResponse.first.id);
       if (savedHouseListResponse.isEmpty) {
-        print('list empty');
         isContentEmpty = true;
         notifyListeners();
         return;
       }
       _houses.addAll(savedHouseListResponse);
-      print(_houses);
       notifyListeners();
     }
   }
 
-  void onHouseTap(BuildContext context, int index) {
+  void onHouseTap(BuildContext context, int index) async {
     final id = _houses[index].id;
-    Navigator.of(context).pushNamed(
+    final result = await Navigator.of(context).pushNamed(
       MainNavigationRouteNames.houseDetails,
       arguments: id,
     );
+    if (result != null && result is bool && result) {
+      // Reload the parent widget
+      setupHouses(context);
+      notifyListeners();
+    }
+
+    // Reload the parent widget
   }
 }

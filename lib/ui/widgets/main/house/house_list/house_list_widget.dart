@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:like_button/like_button.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:uide/domain/models/house_entity/house_entity.dart';
-import 'package:uide/provider/provider.dart';
+import 'package:uide/provider/project_provider.dart';
 import 'package:uide/ui/theme/project_colors.dart';
 import 'package:uide/ui/widgets/main/house/house_list/house_list_model.dart';
 import 'package:uide/utils/search_bar.dart';
@@ -19,8 +19,11 @@ class HouseListWidget extends StatefulWidget {
 class _HouseListWidgetState extends State<HouseListWidget> {
   @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.watch<HouseListModel>(context);
-
+    final model = ProjectNotifierProvider.watch<HouseListModel>(context);
+    if (model == null) {
+      return const SizedBox.shrink();
+    }
+    
     return Container(
       height: MediaQuery.of(context).size.height * 1,
       decoration: kMainBackgroundGradientDecoration,
@@ -30,20 +33,18 @@ class _HouseListWidgetState extends State<HouseListWidget> {
         child: Scaffold(
           extendBody: true,
           backgroundColor: ProjectColors.kTransparent,
-          body: SizedBox(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                children: [
-                  const SizedBox(height: 10),
-                  const SearchBarWidget(hint: 'Поиск домов...'),
-                  model!.isContentEmpty == true
-                      ? Container()
-                      : model.houses.isEmpty
-                          ? const ShimmerHousesListViewWidget()
-                          : HousesListViewWidget(model: model),
-                ],
-              ),
+          body: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              children: [
+                const SizedBox(height: 10),
+                const SearchBarWidget(hint: 'Поиск домов...'),
+                model.isContentEmpty == true
+                    ? const SizedBox.shrink()
+                    : model.houses.isEmpty
+                        ? const ShimmerHousesListViewWidget()
+                        : HousesListViewWidget(model: model),
+              ],
             ),
           ),
         ),
@@ -131,7 +132,7 @@ class HouseItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.watch<HouseListModel>(context);
+    final model = ProjectNotifierProvider.watch<HouseListModel>(context);
 
     bool isLikedHouse = false;
 
@@ -316,19 +317,21 @@ class FadeImageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return AspectRatio(
       aspectRatio: 11 / 5,
-      child: FadeInImage.memoryNetwork(
-        placeholder: kTransparentImage,
-        image: model!.loadImageUrl(house.photos),
-        fit: BoxFit.cover,
-        imageErrorBuilder: (_, __, ___) {
-          return Container(); // or an error placeholder widget
-        },
-        fadeInDuration: const Duration(milliseconds: 1000),
-        fadeOutDuration: const Duration(milliseconds: 1000),
-        width: double.infinity,
-        height: 200,
-        // Optional: You can specify additional parameters like alignment, repeat, etc.
-      ),
+      child: !model!.isConnected
+          ? Image.memory(kTransparentImage)
+          : FadeInImage.memoryNetwork(
+              placeholder: kTransparentImage,
+              image: model!.loadImageUrl(house.photos),
+              fit: BoxFit.cover,
+              imageErrorBuilder: (_, __, ___) {
+                return Container(); // or an error placeholder widget
+              },
+              fadeInDuration: const Duration(milliseconds: 1000),
+              fadeOutDuration: const Duration(milliseconds: 1000),
+              width: double.infinity,
+              height: 200,
+              // Optional: You can specify additional parameters like alignment, repeat, etc.
+            ),
     );
   }
 }

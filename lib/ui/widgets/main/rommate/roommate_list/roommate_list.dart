@@ -32,20 +32,6 @@ class _RoommateListWidgetState extends State<RoommateListWidget> {
     setState(() {});
   }
 
-  void _filterRoommates(String query) {
-    setState(() {
-      _filteredRoommates = _roommates.where(
-        (roommate) {
-          final name = roommate.name.toLowerCase();
-          final description = roommate.description.toLowerCase();
-          final searchQuery = query.toLowerCase();
-          return name.contains(searchQuery) ||
-              description.contains(searchQuery);
-        },
-      ).toList();
-    });
-  }
-
   void onRoommateTap(int index) {
     final id = _filteredRoommates[index].id;
     Navigator.of(context)

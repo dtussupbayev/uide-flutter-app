@@ -7,7 +7,7 @@ import 'package:uide/ui/theme/project_colors.dart';
 import 'package:uide/ui/theme/project_styles.dart';
 import 'package:uide/ui/widgets/main/saved/saved_house_list_model.dart';
 
-import '../../../../../provider/provider.dart';
+import '../../../../provider/project_provider.dart';
 import '../../../../../utils/search_bar.dart';
 
 class SavedHouseListWidget extends StatefulWidget {
@@ -29,8 +29,15 @@ class _SavedHouseListWidgetState extends State<SavedHouseListWidget>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    model.setupHouses(context);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final model = NotifierProvider.watch<SavedHouseListModel>(context);
+    final model = ProjectNotifierProvider.watch<SavedHouseListModel>(context);
 
     return Container(
       height: MediaQuery.of(context).size.height,
@@ -39,130 +46,116 @@ class _SavedHouseListWidgetState extends State<SavedHouseListWidget>
         top: true,
         bottom: false,
         child: Scaffold(
-          appBar: const SavedAppBar(),
-          extendBody: true,
-          backgroundColor: ProjectColors.kTransparent,
-          body: model!.isContentEmpty
-              ? SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.65,
-                  child: const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.view_list_rounded,
-                          color: ProjectColors.kWhite,
-                          size: 32,
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          'У вас пока нет домов в избранных',
-                          style: TextStyle(
-                            fontSize: 16,
+            appBar: const SavedAppBar(),
+            extendBody: true,
+            backgroundColor: ProjectColors.kTransparent,
+            body: model!.isContentEmpty
+                ? SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.65,
+                    child: const Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.view_list_rounded,
                             color: ProjectColors.kWhite,
+                            size: 32,
                           ),
-                        ),
-                        SizedBox(height: 7),
-                      ],
+                          SizedBox(height: 10),
+                          Text(
+                            'У вас пока нет домов в избранных',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: ProjectColors.kWhite,
+                            ),
+                          ),
+                          SizedBox(height: 7),
+                        ],
+                      ),
                     ),
-                  ),
-                )
-              : SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.76,
-                  child: SingleChildScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 10),
-                        const SearchBarWidget(
-                          hint: 'Поиск в избранных...',
-                        ),
-                        model.houses.isEmpty
-                            ? ListView.separated(
-                                shrinkWrap: true,
-                                itemBuilder: (context, index) =>
-                                    Shimmer.fromColors(
-                                      baseColor:
-                                          ProjectColors.kBlack.withOpacity(0.6),
-                                      highlightColor:
-                                          ProjectColors.kBlack.withOpacity(0.3),
-                                      child: SizedBox(
-                                        width: 350,
-                                        height: 350,
-                                        child: Padding(
-                                          padding: kHouseItemPadding,
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: ProjectColors.kTransparent,
-                                              border: Border.all(
-                                                  color: ProjectColors.kBlack
-                                                      .withOpacity(0.1)),
-                                              borderRadius:
-                                                  const BorderRadius.all(
-                                                      Radius.circular(30)),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: ProjectColors.kBlack
-                                                      .withOpacity(0.2),
-                                                  blurRadius: 8,
-                                                  offset: const Offset(0, 2),
-                                                ),
-                                              ],
+                  )
+                : SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.76,
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 10),
+                          const SearchBarWidget(
+                            hint: 'Поиск в избранных...',
+                          ),
+                          model.houses.isEmpty
+                              ? ListView.separated(
+                                  shrinkWrap: true,
+                                  itemBuilder: (context, index) =>
+                                      Shimmer.fromColors(
+                                        baseColor: ProjectColors.kBlack
+                                            .withOpacity(0.6),
+                                        highlightColor: ProjectColors.kBlack
+                                            .withOpacity(0.3),
+                                        child: SizedBox(
+                                          width: 350,
+                                          height: 350,
+                                          child: Padding(
+                                            padding: kHouseItemPadding,
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                color:
+                                                    ProjectColors.kTransparent,
+                                                border: Border.all(
+                                                    color: ProjectColors.kBlack
+                                                        .withOpacity(0.1)),
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(30)),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: ProjectColors.kBlack
+                                                        .withOpacity(0.2),
+                                                    blurRadius: 8,
+                                                    offset: const Offset(0, 2),
+                                                  ),
+                                                ],
+                                              ),
+                                              clipBehavior: Clip.hardEdge,
                                             ),
-                                            clipBehavior: Clip.hardEdge,
                                           ),
                                         ),
                                       ),
-                                    ),
-                                separatorBuilder: (context, index) =>
-                                    const SizedBox(height: 10),
-                                itemCount: 2)
-                            : ListView.separated(
-                                padding: const EdgeInsets.only(bottom: 70),
-                                shrinkWrap: true,
-                                physics: const BouncingScrollPhysics(),
-                                separatorBuilder: (context, index) =>
-                                    const SizedBox(height: 10),
-                                itemCount: model.houses.length,
-                                itemBuilder: (context, index) {
-                                  final house = model.houses[index];
+                                  separatorBuilder: (context, index) =>
+                                      const SizedBox(height: 10),
+                                  itemCount: 2)
+                              : ListView.separated(
+                                  padding: const EdgeInsets.only(bottom: 70),
+                                  shrinkWrap: true,
+                                  physics: const BouncingScrollPhysics(),
+                                  separatorBuilder: (context, index) =>
+                                      const SizedBox(height: 10),
+                                  itemCount: model.houses.length,
+                                  itemBuilder: (context, index) {
+                                    final house = model.houses[index];
 
-                                  return Column(
-                                    children: [
-                                      SizedBox(
-                                        height: 350,
-                                        child: HouseItem(
-                                          house: house,
-                                          onTap: () =>
-                                              model.onHouseTap(context, index),
-                                          onLikeTap: () => {},
+                                    return Column(
+                                      children: [
+                                        SizedBox(
+                                          height: 350,
+                                          child: HouseItem(
+                                            house: house,
+                                            onTap: () => model.onHouseTap(
+                                                context, index),
+                                            onLikeTap: () => {},
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              ),
-
-                        // ListView.builder(
-                        //   shrinkWrap: true,
-                        //   physics: const BouncingScrollPhysics(),
-                        //   itemCount: _rooms.length,
-                        //   itemExtent: 350,
-                        //   itemBuilder: (BuildContext context, int index) {
-                        //     final room = _rooms[index];
-                        //     return RoomItem(
-                        //       room: room,
-                        //       onTap: () => onRoomTap(index),
-                        //     );
-                        //   },
-                        // ),
-                      ],
+                                      ],
+                                    );
+                                  },
+                                ),
+                        ],
+                      ),
                     ),
-                  ),
-                ),
-        ),
+                  )),
       ),
     );
   }

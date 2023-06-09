@@ -17,11 +17,6 @@ class SearchBarWidget extends StatefulWidget {
 class _SearchBarWidgetState extends State<SearchBarWidget> {
   TextEditingController searchController = TextEditingController();
 
-  // void _clearTextField() {
-  //   searchController.clear();
-  //   widget.filter(searchController.text);
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -40,7 +35,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                     color: ProjectColors.kWhite.withOpacity(0.7),
                   ),
                   controller: searchController,
-                  onChanged: (String) {},
+                  onChanged: (String text) {},
                   decoration: kDefaultInputDecoration.copyWith(
                     hintText: widget.hint,
                     prefixIcon: const IconTheme(

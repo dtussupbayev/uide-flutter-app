@@ -10,20 +10,28 @@ class SavedHouseListModel extends ChangeNotifier {
   final _houses = <HouseEntity>[].toList();
   bool isContentEmpty = false;
   bool result = false;
+  final _savedHouseIds = <String?>{};
+
   ConnectivityResult? connectivityResult;
 
   List<HouseEntity> get houses => List.unmodifiable(_houses);
   bool get isLoading => _isLoading;
 
-  void setupHouses(BuildContext context) {
+  void setupHouses(BuildContext context) async {
     _isLoading = true;
     notifyListeners();
+
     _houses.clear();
     Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
       connectivityResult = result;
       notifyListeners();
     });
-    loadHouses(context);
+    await Future.delayed(const Duration(milliseconds: 1100));
+
+    if (context.mounted) {
+      loadHouses(context);
+      loadSavedHouses(context);
+    }
     _isLoading = false;
     notifyListeners();
   }
@@ -31,7 +39,6 @@ class SavedHouseListModel extends ChangeNotifier {
   Future<void> loadHouses(BuildContext context) async {
     final savedHouseListResponse =
         await _apiClient.savedHousesResponse(context);
-    print(savedHouseListResponse);
     if (savedHouseListResponse != null) {
       if (savedHouseListResponse.isEmpty) {
         isContentEmpty = true;
@@ -43,6 +50,36 @@ class SavedHouseListModel extends ChangeNotifier {
     }
   }
 
+  Future<void> loadSavedHouses(BuildContext context) async {
+    final savedHouseListResponse =
+        await _apiClient.savedHousesResponse(context);
+    if (savedHouseListResponse != null) {
+      _savedHouseIds.clear();
+      for (var house in savedHouseListResponse) {
+        _savedHouseIds.add(house.id);
+      }
+      notifyListeners();
+    }
+  }
+
+  bool checkIsSaved(String? houseId, BuildContext context) {
+    if (_savedHouseIds.where((element) => element == houseId).isNotEmpty) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<void> deleteFromSaved(String? houseId, BuildContext context) async {
+    _apiClient.deleteFromSaved(houseId: houseId ?? '', context: context);
+
+    _savedHouseIds.remove(houseId);
+    notifyListeners();
+
+    await Future.delayed(const Duration(milliseconds: 100));
+    if (context.mounted) setupHouses(context);
+  }
+
   void onHouseTap(BuildContext context, int index) async {
     final id = _houses[index].id;
     final result = await Navigator.of(context).pushNamed(
@@ -51,7 +88,8 @@ class SavedHouseListModel extends ChangeNotifier {
     );
     if (result != null && result is bool && result) {
       // Reload the parent widget
-      setupHouses(context);
+      if (context.mounted) setupHouses(context);
+
       notifyListeners();
     }
 

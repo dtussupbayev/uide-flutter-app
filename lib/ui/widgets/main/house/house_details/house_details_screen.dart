@@ -18,7 +18,6 @@ class HouseDetailsScreen extends StatefulWidget {
 }
 
 class _HouseDetailsScreenState extends State<HouseDetailsScreen> {
-  
 
   @override
   Widget build(BuildContext context) {

@@ -23,7 +23,7 @@ class _HouseListWidgetState extends State<HouseListWidget> {
     if (model == null) {
       return const SizedBox.shrink();
     }
-    
+
     return Container(
       height: MediaQuery.of(context).size.height * 1,
       decoration: kMainBackgroundGradientDecoration,
@@ -134,8 +134,6 @@ class HouseItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final model = ProjectNotifierProvider.watch<HouseListModel>(context);
 
-    bool isLikedHouse = false;
-
     return Padding(
       padding: kHouseItemPadding,
       child: Stack(
@@ -191,9 +189,10 @@ class HouseItem extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(left: 2.5),
                 child: LikeButton(
-                  isLiked: isLikedHouse, // house.liked,
+                  isLiked:
+                      model!.checkIsSaved(house.id, context), // house.liked,
                   likeBuilder: (isTapped) {
-                    return isLikedHouse
+                    return model.checkIsSaved(house.id, context)
                         ? const Icon(
                             Icons.favorite_rounded,
                             color: ProjectColors.kWhite,
@@ -204,7 +203,11 @@ class HouseItem extends StatelessWidget {
                           );
                   },
                   onTap: (isTapped) async {
-                    isLikedHouse = !isLikedHouse;
+                    if (model.checkIsSaved(house.id, context)) {
+                      model.deleteFromSaved(house.id, context);
+                    } else {
+                      model.addToSaved(house.id, context);
+                    }
                     return !isTapped;
                   },
                 ),

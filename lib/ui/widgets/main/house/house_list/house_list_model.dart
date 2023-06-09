@@ -14,19 +14,27 @@ class HouseListModel extends ChangeNotifier {
   late int _totalPage;
   var _isLoadingInProgres = false;
   bool isContentEmpty = false;
+  final _savedHouseIds = <String?>{};
   List<HouseEntity> get houses => List.unmodifiable(_houses.toList());
   List<HouseEntity> get savedHouses => List.unmodifiable(_savedHouses.toList());
   bool get isLoading => _isLoading;
   bool isConnected = true;
 
-  void setupHouses(BuildContext context) {
+  void setupHouses(BuildContext context) async {
     _isLoading = true;
     notifyListeners();
     _currentPage = -1;
     _totalPage = 1;
     _houses.clear();
+    _savedHouseIds.clear();
     checkConnectivity();
-    _loadHouses(context);
+    await Future.delayed(const Duration(milliseconds: 800));
+
+    if (context.mounted) {
+      loadSavedHouses(context);
+      _loadHouses(context);
+    }
+
     _isLoading = false;
     notifyListeners();
   }
@@ -61,12 +69,43 @@ class HouseListModel extends ChangeNotifier {
     final savedHouseListResponse =
         await _apiClient.savedHousesResponse(context);
     if (savedHouseListResponse != null) {
-      if (savedHouseListResponse.isEmpty) {
-        isContentEmpty = true;
-        notifyListeners();
-        return;
+      for (var house in savedHouseListResponse) {
+        _savedHouseIds.add(house.id);
       }
-      _houses.addAll(savedHouseListResponse);
+      notifyListeners();
+    }
+  }
+
+  bool checkIsSaved(String? houseId, BuildContext context) {
+    if (_savedHouseIds.where((element) => element == houseId).isNotEmpty) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<void> addToSaved(String? houseId, BuildContext context) async {
+    _apiClient.addToSaved(houseId: houseId ?? '');
+
+    _savedHouseIds.add(houseId);
+    notifyListeners();
+  }
+
+  Future<void> deleteFromSaved(String? houseId, BuildContext context) async {
+    _apiClient.deleteFromSaved(houseId: houseId ?? '', context: context);
+
+    _savedHouseIds.remove(houseId);
+    notifyListeners();
+  }
+
+  void onHouseTap(BuildContext context, int index) async {
+    final id = _houses.toList()[index].id;
+    final result = await Navigator.of(context).pushNamed(
+      MainNavigationRouteNames.houseDetails,
+      arguments: id,
+    );
+    if (result != null && result is bool && result) {
+      if(context.mounted) setupHouses(context);
       notifyListeners();
     }
   }
@@ -74,16 +113,6 @@ class HouseListModel extends ChangeNotifier {
   void showedHouseAtIndex(int index, BuildContext context) {
     if (index < _houses.length - 1) return;
     _loadHouses(context);
-  }
-
-  void checkHouseAtIndedInSaved(int index, BuildContext context) {}
-
-  void onHouseTap(BuildContext context, int index) {
-    final id = _houses.toList()[index].id;
-    Navigator.of(context).pushNamed(
-      MainNavigationRouteNames.houseDetails,
-      arguments: id,
-    );
   }
 
   Future<void> checkConnectivity() async {

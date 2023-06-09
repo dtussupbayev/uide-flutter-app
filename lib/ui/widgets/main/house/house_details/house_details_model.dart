@@ -19,7 +19,7 @@ class HouseDetailsModel extends ChangeNotifier {
 
   Future<void> loadDetails(BuildContext context) async {
     _houseDetails = await _apiClient.houseDetails(houseId, context);
-    await checkIsSaved(houseId, context);
+    if(context.mounted) await checkIsSaved(houseId, context);
     notifyListeners();
   }
 
@@ -30,13 +30,10 @@ class HouseDetailsModel extends ChangeNotifier {
     if (savedHousesList!.where((element) => element.id == houseId).isNotEmpty) {
       _isSaved = true;
       notifyListeners();
-      print('isSaved=truee');
-
       return;
     } else {
       _isSaved = false;
       notifyListeners();
-      print('isSaved=falsee');
     }
   }
 
@@ -45,7 +42,6 @@ class HouseDetailsModel extends ChangeNotifier {
 
     _isSaved = true;
     notifyListeners();
-    print('isSaved=true');
   }
 
   Future<void> deleteFromSaved(String houseId, BuildContext context) async {
@@ -56,7 +52,6 @@ class HouseDetailsModel extends ChangeNotifier {
     _isSaved = false;
 
     notifyListeners();
-    print('isSaved=false');
   }
 
   String loadImageUrl(List<Photo>? image) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:like_button/like_button.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:uide/domain/models/house_entity/house_entity.dart';
@@ -181,6 +182,8 @@ class HouseItem extends StatefulWidget {
 class _HouseItemState extends State<HouseItem> {
   @override
   Widget build(BuildContext context) {
+    final model = ProjectNotifierProvider.watch<SavedHouseListModel>(context);
+
     String loadImageUrl(List<Photo>? image) {
       if (image!.isNotEmpty) {
         if (image.first.link !=
@@ -323,42 +326,42 @@ class _HouseItemState extends State<HouseItem> {
               onTap: widget.onTap,
             ),
           ),
-          // Positioned(
-          //   right: 22,
-          //   bottom: 22,
-          //   child: Container(
-          //     height: 40,
-          //     width: 40,
-          //     decoration: BoxDecoration(
-          //       color: ProjectColors.kTransparent,
-          //       borderRadius: BorderRadius.circular(8),
-          //     ),
-          //     child: Padding(
-          //       padding: const EdgeInsets.only(left: 2.5),
-          //       child: LikeButton(
-          //         isLiked: widget.house.liked,
-          //         likeBuilder: (isTapped) {
-          //           return widget.house.liked
-          //               ? const Icon(
-          //                   Icons.favorite_rounded,
-          //                   color: ProjectColors.kWhite,
-          //                 )
-          //               : const Icon(
-          //                   Icons.favorite_border_rounded,
-          //                   color: ProjectColors.kWhite,
-          //                 );
-          //         },
-          //         onTap: (isTapped) async {
-          //           setState(() {
-          //             widget.house.liked = !widget.house.liked;
-          //             widget.onLikeTap();
-          //           });
-          //           return !isTapped;
-          //         },
-          //       ),
-          //     ),
-          //   ),
-          // ),
+          Positioned(
+            right: 22,
+            bottom: 22,
+            child: Container(
+              height: 40,
+              width: 40,
+              decoration: BoxDecoration(
+                color: ProjectColors.kTransparent,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 2.5),
+                child: LikeButton(
+                  isLiked: model!
+                      .checkIsSaved(widget.house.id, context), // house.liked,
+                  likeBuilder: (isTapped) {
+                    return model.checkIsSaved(widget.house.id, context)
+                        ? const Icon(
+                            Icons.favorite_rounded,
+                            color: ProjectColors.kWhite,
+                          )
+                        : const Icon(
+                            Icons.favorite_border_rounded,
+                            color: ProjectColors.kWhite,
+                          );
+                  },
+                  onTap: (isTapped) async {
+                    if (model.checkIsSaved(widget.house.id, context)) {
+                      model.deleteFromSaved(widget.house.id, context);
+                    } 
+                    return !isTapped;
+                  },
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

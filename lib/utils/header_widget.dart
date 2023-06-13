@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:uide/ui/theme/project_colors.dart';
 
 class HeaderWidget extends StatelessWidget {
-  const HeaderWidget({super.key});
+  final double height;
+  const HeaderWidget({super.key, required this.height});
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.23,
+      height: height,
       width: MediaQuery.of(context).size.width,
       child: const Padding(
         padding: EdgeInsets.only(top: 45.0),

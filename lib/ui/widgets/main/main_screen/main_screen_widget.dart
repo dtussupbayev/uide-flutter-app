@@ -1,31 +1,39 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:uide/provider/project_provider.dart';
+import 'package:uide/ui/provider/project_provider.dart';
 import 'package:uide/ui/theme/project_colors.dart';
+import 'package:uide/ui/theme/project_styles.dart';
 import 'package:uide/ui/widgets/main/home/home_screen_widget.dart';
+import 'package:uide/ui/widgets/main/main_screen/main_screen_model.dart';
+import 'package:uide/ui/widgets/main/profile/profile_screen_model.dart';
 import 'package:uide/ui/widgets/main/saved/saved_house_list_model.dart';
 import 'package:uide/ui/widgets/main/saved/saved_house_list_widget.dart';
 import 'package:uide/ui/widgets/main/profile/profile_screen_widget.dart';
 import 'package:uide/utils/connectivity_check_widget.dart';
 
-import '../../theme/project_styles.dart';
-
 class MainScreenWidget extends StatefulWidget {
-  const MainScreenWidget({Key? key}) : super(key: key);
+  final int selectedPageIndex;
+
+  const MainScreenWidget({Key? key, this.selectedPageIndex = 1})
+      : super(key: key);
 
   @override
-  MainScreenWidgetState createState() => MainScreenWidgetState();
+  State<MainScreenWidget> createState() => MainScreenWidgetState();
 }
 
 class MainScreenWidgetState extends State<MainScreenWidget>
     with AutomaticKeepAliveClientMixin {
   final savedHouseListModel = SavedHouseListModel();
 
-  int _selectedPageIndex = 1;
+  int _selectedPageIndex = 0;
   PageController? _pageController;
 
   @override
   void initState() {
     super.initState();
+    _selectedPageIndex = widget.selectedPageIndex;
     _pageController = PageController(initialPage: _selectedPageIndex);
   }
 
@@ -44,6 +52,8 @@ class MainScreenWidgetState extends State<MainScreenWidget>
 
   @override
   Widget build(BuildContext context) {
+    final model = ProjectNotifierProvider.watch<MainScreenModel>(context);
+
     super.build(context); // Required for AutomaticKeepAliveClientMixin
     return Scaffold(
       extendBody: true,
@@ -59,26 +69,42 @@ class MainScreenWidgetState extends State<MainScreenWidget>
                 child: const SavedHouseListWidget(),
               ),
             ),
-            const HomeScreenWidget(),
-            const UserProfileWidget(),
+            HomeScreenWidget(
+              isFilterMenuOpen: model!.isFilterMenuOpen,
+              toggleFilterMenu: model.toggleFilterMenu,
+            ),
+            ConnectivityCheckWidget(
+              connectedWidget: ProjectNotifierProvider(
+                  create: () => UserProfileModel()..loadProfile(context),
+                  isManagingModel: false,
+                  child: const UserProfileScreen()),
+            ),
           ],
         ),
       ),
-      resizeToAvoidBottomInset: true,
-      bottomNavigationBar: Align(
-        alignment: Alignment.bottomCenter,
-        child: ClipRRect(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(30),
-            topRight: Radius.circular(30),
-          ),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            width: MediaQuery.of(context).size.width * 0.5,
-            decoration: kBottomNavigationBarDecoration,
-            child: CustomBottomNavigationBar(
-              selectedPageIndex: _selectedPageIndex,
-              onTapItem: changePage,
+      resizeToAvoidBottomInset: false,
+      bottomNavigationBar: Visibility(
+        visible: !model.isFilterMenuOpen,
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(30),
+              topRight: Radius.circular(30),
+            ),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              width: kIsWeb ||
+                      Platform.isMacOS ||
+                      Platform.isLinux ||
+                      Platform.isWindows
+                  ? MediaQuery.of(context).size.width * 0.4
+                  : MediaQuery.of(context).size.width * 0.5,
+              decoration: kBottomNavigationBarDecoration,
+              child: CustomBottomNavigationBar(
+                selectedPageIndex: _selectedPageIndex,
+                onTapItem: changePage,
+              ),
             ),
           ),
         ),

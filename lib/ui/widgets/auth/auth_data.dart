@@ -3,6 +3,7 @@ class UserAuthData {
   String? username;
   String? phone;
   String? sex;
+  String? cityId;
 
-  UserAuthData({this.email, this.username, this.phone, this.sex});
+  UserAuthData({this.email, this.username, this.phone, this.sex, this.cityId});
 }

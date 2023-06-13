@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:uide/provider/project_provider.dart';
+import 'package:uide/ui/provider/project_provider.dart';
 import 'package:uide/ui/theme/project_styles.dart';
 import 'package:uide/ui/theme/project_colors.dart';
 import 'package:uide/ui/widgets/main/ads/create_ad_screen/create_ad_screen_model.dart';
@@ -18,7 +18,7 @@ class _CreateAdScreenWidgetState extends State<CreateAdScreenWidget> {
   @override
   Widget build(BuildContext context) {
     final model = ProjectNotifierProvider.watch<CreateAdScreenModel>(context);
-    String? selectedCiyValue;
+    String? selectedCityValue;
     String? selectedHouseValue;
 
     return DecoratedBox(
@@ -41,7 +41,7 @@ class _CreateAdScreenWidgetState extends State<CreateAdScreenWidget> {
                           selectedHouseValue: selectedHouseValue, model: model),
                       const SizedBox(width: 10),
                       ChooseCityWidget(
-                          selectedCiyValue: selectedCiyValue, model: model),
+                          selectedCityValue: selectedCityValue, model: model),
                     ],
                   ),
                   const SizedBox(height: 25),
@@ -368,11 +368,11 @@ class UploadImageWidget extends StatelessWidget {
 class ChooseCityWidget extends StatelessWidget {
   const ChooseCityWidget({
     super.key,
-    required this.selectedCiyValue,
+    required this.selectedCityValue,
     required this.model,
   });
 
-  final String? selectedCiyValue;
+  final String? selectedCityValue;
   final CreateAdScreenModel? model;
 
   @override
@@ -395,7 +395,7 @@ class ChooseCityWidget extends StatelessWidget {
                 color: ProjectColors.kWhite.withOpacity(0.4),
               ),
               hintText: 'Город'),
-          value: selectedCiyValue,
+          value: selectedCityValue,
           items: const [
             DropdownMenuItem(
               value: 'Алматы',
@@ -449,11 +449,11 @@ class ChooseTypeOfHouseWidget extends StatelessWidget {
           value: selectedHouseValue,
           items: const [
             DropdownMenuItem(
-              value: 'APPARTMENT',
+              value: 'HOUSE',
               child: Text('Частный дом'),
             ),
             DropdownMenuItem(
-              value: 'HOUSE',
+              value: 'APPARTMENT',
               child: Text('Квартира'),
             ),
           ],
@@ -505,13 +505,12 @@ class DefaultAppBar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(120);
 }
 
-// ignore: must_be_immutable
 class DefaultInputTextField extends StatefulWidget {
   final String hintText;
   final TextInputType keyboardType;
-  TextEditingController controller;
+  final TextEditingController controller;
 
-  DefaultInputTextField({
+  const DefaultInputTextField({
     required this.controller,
     required this.hintText,
     super.key,
@@ -553,13 +552,12 @@ class _DefaultInputTextFieldState extends State<DefaultInputTextField> {
   }
 }
 
-// ignore: must_be_immutable
 class DefaultNumberInputTextField extends StatefulWidget {
   final String hintText;
   final TextInputType keyboardType;
-  TextEditingController controller;
+  final TextEditingController controller;
 
-  DefaultNumberInputTextField({
+  const DefaultNumberInputTextField({
     required this.controller,
     required this.hintText,
     super.key,

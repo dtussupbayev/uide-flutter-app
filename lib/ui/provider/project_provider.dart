@@ -87,7 +87,9 @@ class ProjectProvider<Model> extends InheritedWidget {
         );
 
   static Model? watch<Model>(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<ProjectProvider<Model>>()?.model;
+    return context
+        .dependOnInheritedWidgetOfExactType<ProjectProvider<Model>>()
+        ?.model;
   }
 
   static Model? read<Model>(BuildContext context) {

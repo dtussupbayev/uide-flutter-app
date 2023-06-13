@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:uide/provider/project_provider.dart';
+import 'package:uide/ui/provider/project_provider.dart';
 import 'package:uide/ui/theme/project_colors.dart';
 import 'package:uide/ui/widgets/main/ads/my_ads_details/my_ads_details_model.dart';
 
@@ -7,7 +7,7 @@ class MyAdsDetailsContent extends StatefulWidget {
   const MyAdsDetailsContent({super.key});
 
   @override
-  MyAdsDetailsContentState createState() => MyAdsDetailsContentState();
+  State<MyAdsDetailsContent> createState() => MyAdsDetailsContentState();
 }
 
 class MyAdsDetailsContentState extends State<MyAdsDetailsContent> {

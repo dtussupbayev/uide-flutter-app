@@ -18,16 +18,16 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="Uide">
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="uide">
+  <meta name="apple-mobile-web-app-title" content="Uide">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/png" href="icons/Icon-192.png"/>
 
   <title>uide</title>
   <link rel="manifest" href="manifest.json">
@@ -41,19 +41,34 @@
 </head>
 <body>
   <script>
-    window.addEventListener('load', function(ev) {
-      // Download main.dart.js
-      _flutter.loader.loadEntrypoint({
-        serviceWorker: {
-          serviceWorkerVersion: serviceWorkerVersion,
-        },
-        onEntrypointLoaded: function(engineInitializer) {
-          engineInitializer.initializeEngine().then(function(appRunner) {
-            appRunner.runApp();
-          });
-        }
-      });
-    });
+    function isReload() {
+  try {
+    return (
+      (window.performance.navigation && window.performance.navigation.type === 1) ||
+        window.performance.getEntriesByType('navigation').map((nav) => nav.type).includes('reload')
+    );
+  } catch(err) {
+    return false;
+  }
+}
+
+if (isReload()) {
+  console.log("Page accessed by reload, redirecting...");
+  window.location.replace('/');
+} else {
+  window.addEventListener('load', function(ev) {
+  // Download main.dart.js
+  _flutter.loader.loadEntrypoint({
+    serviceWorker: {
+      serviceWorkerVersion: serviceWorkerVersion,
+    }
+  }).then(function(engineInitializer) {
+    return engineInitializer.initializeEngine();
+  }).then(function(appRunner) {
+    return appRunner.runApp();
+  });
+  });
+}
   </script>
 </body>
 </html>

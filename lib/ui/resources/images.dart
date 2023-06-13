@@ -14,4 +14,7 @@ class Images {
   static const String userAvatar = 'assets/images/user_avatar.jpg';
   static const String userAvatar2 = 'assets/images/user_avatar_2.jpg';
   static const String userAvatar3 = 'assets/images/user_avatar_3.jpg';
+  static const String avatarPlaceholder =
+      'assets/images/avatar-placeholder.png';
+  static const String appleAppIcon = 'assets/images/apple-icon.png';
 }

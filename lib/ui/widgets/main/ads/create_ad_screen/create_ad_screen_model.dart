@@ -1,13 +1,14 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:uide/domain/api_client/api_client.dart';
-import 'package:uide/navigation/main_navigation.dart';
+import 'package:uide/ui/navigation/main_navigation.dart';
 import 'package:uide/ui/theme/project_colors.dart';
 
 class CreateAdScreenModel extends ChangeNotifier {
@@ -26,19 +27,20 @@ class CreateAdScreenModel extends ChangeNotifier {
   TextEditingController descriptionController = TextEditingController();
   List<String> photos = [];
   String city = '';
+  String sex = '';
 
   bool isUploading = false;
+  // ignore: unused_field
+  File? _image;
+
   int selectedRoomIndex = 0;
   bool isCustomSelected = false;
 
-  // ignore: unused_field
-  File? _image;
 
   createImageUrl() async {
     String imageUrl = await chooseAndUploadImage();
     imageUrl =
         imageUrl.length > 2 ? imageUrl.substring(1, imageUrl.length - 1) : '';
-    print(imageUrl);
     if (imageUrl.length > 2) {
       photos.add(imageUrl);
     }
@@ -74,6 +76,7 @@ class CreateAdScreenModel extends ChangeNotifier {
       numberOfRooms: int.parse(numberOfRoomsController.text),
       photos: photos,
       price: double.parse(priceController.text),
+      context: context,
     );
 
     if (context.mounted) {
@@ -105,8 +108,6 @@ class CreateAdScreenModel extends ChangeNotifier {
       );
     }
     notifyListeners();
-
-    // Navigator.of(context).pushNamed(MainNavigationRouteNames.myAdsScreen);
   }
 
   Future<String> chooseAndUploadImage() async {
@@ -120,7 +121,7 @@ class CreateAdScreenModel extends ChangeNotifier {
       notifyListeners();
       final uploadedImageUrl = await _uploadImage(imageFile);
 
-      isUploading = false; // Reset the flag after the upload is finished
+      isUploading = false;
       notifyListeners();
       return uploadedImageUrl;
     }
@@ -132,13 +133,10 @@ class CreateAdScreenModel extends ChangeNotifier {
       'POST',
       Uri.parse('https://rent-house-production-82fe.up.railway.app/aws'),
     );
-    print(imageFile.path);
-    // Replace the file path with the actual path of the image you want to upload
     var file = await http.MultipartFile.fromPath(
       'file',
       imageFile.path,
-      contentType: MediaType(
-          'image', 'jpeg'), // Adjust the content type based on your image file
+      contentType: MediaType('image', 'jpeg'),
     );
 
     request.files.add(file);
@@ -148,14 +146,14 @@ class CreateAdScreenModel extends ChangeNotifier {
       if (response.statusCode == 200) {
         var responseBody = await response.stream.bytesToString();
 
-        print('Image uploaded successfully. Response: $responseBody');
         return responseBody;
       } else {
-        print('Image upload failed with status code ${response.statusCode}');
         return '';
       }
     } catch (e) {
-      print('Error uploading image: $e');
+      if (kDebugMode) {
+        print('Error uploading image: $e');
+      }
       return '';
     }
   }

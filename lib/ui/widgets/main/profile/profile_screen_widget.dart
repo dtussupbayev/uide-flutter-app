@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uide/domain/data_provider/token_data_provider.dart';
-import 'package:uide/navigation/main_navigation.dart';
-import 'package:uide/resources/resources.dart';
+import 'package:uide/ui/navigation/main_navigation.dart';
+import 'package:uide/ui/provider/project_provider.dart';
+import 'package:uide/ui/resources/resources.dart';
 
 import 'package:uide/ui/theme/project_colors.dart';
 import 'package:uide/ui/theme/project_styles.dart';
 import 'package:uide/ui/widgets/main/profile/img.dart';
+import 'package:uide/ui/widgets/main/profile/profile_screen_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class UserProfileWidget extends StatelessWidget {
+class UserProfileScreen extends StatefulWidget {
   static const List<MenuRowData> firstMenuRow = [
     MenuRowData(Icons.settings_outlined, 'Настройки'),
   ];
@@ -20,6 +22,29 @@ class UserProfileWidget extends StatelessWidget {
   static const List<MenuRowData> thirdMenuRow = [
     MenuRowData(Icons.shield, 'Политика конфиденциальности'),
   ];
+
+  const UserProfileScreen({Key? key}) : super(key: key);
+
+  @override
+  State<UserProfileScreen> createState() => _UserProfileScreenState();
+}
+
+class _UserProfileScreenState extends State<UserProfileScreen> {
+  final UserProfileModel model = UserProfileModel();
+
+  @override
+  void initState() {
+    super.initState();
+
+    model.loadProfile(context);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    model.loadProfile(context);
+  }
 
   Future<void> _launchCall() async {
     String phoneNumber = 'tel:+77470470363';
@@ -53,88 +78,101 @@ class UserProfileWidget extends StatelessWidget {
     }
   }
 
-  const UserProfileWidget({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
+    final model = ProjectNotifierProvider.watch<UserProfileModel>(context);
+    if (model == null) {
+      return const SizedBox.shrink();
+    }
     return DecoratedBox(
       decoration: kMainBackgroundGradientDecoration,
       child: SafeArea(
         top: true,
         bottom: false,
         child: Scaffold(
-          appBar: AppBar(
-            toolbarHeight: 66,
-            centerTitle: true,
-            elevation: 0,
-            title: const Center(child: Text('Профиль')),
+            appBar: AppBar(
+              toolbarHeight: 66,
+              centerTitle: true,
+              elevation: 0,
+              title: const Center(child: Text('Профиль')),
+              backgroundColor: ProjectColors.kTransparent,
+            ),
             backgroundColor: ProjectColors.kTransparent,
-          ),
-          backgroundColor: ProjectColors.kTransparent,
-          body: ListView(
-            padding: EdgeInsets.zero,
-            physics: const BouncingScrollPhysics(),
-            children: <Widget>[
-              const _UserInfo(),
-              const SizedBox(height: 20),
-              const MyAdsRowItemWidget(),
-              const CreateAdRowItemWidget(),
-              const SavedRoomsRowItemWidget(),
-              const SignOutRowItemWidget(),
-              const SizedBox(height: 10),
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                child: Text(
-                  'Помощь',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: ProjectColors.kDarkGreen,
-                  ),
-                ),
-              ),
-              InkWell(
-                onTap: _launchCall,
-                child: const _MenuWidgetRow(
-                  menuRowData: MenuRowData(Icons.call, '+77470470363'),
-                ),
-              ),
-              InkWell(
-                onTap: _launchEmailApp,
-                child: const _MenuWidgetRow(
-                  menuRowData: MenuRowData(Icons.email, 'support@uide.com'),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const QuestionsAboutRowItemWidget(),
-              const PrivacyPolicyRowItemWidget(),
-              const SizedBox(height: 80)
-            ],
-          ),
-        ),
+            body: model.userProfileResponse != null
+                ? ListView(
+                    padding: EdgeInsets.zero,
+                    physics: const BouncingScrollPhysics(),
+                    children: <Widget>[
+                      _UserInfo(model: model),
+                      const SizedBox(height: 20),
+                      const MyAdsRowItemWidget(),
+                      const CreateAdRowItemWidget(),
+                      const SavedRoomsRowItemWidget(),
+                      const SignOutRowItemWidget(),
+                      model.isAdmin == true
+                          ? const AdminRowItemWidget()
+                          : const SizedBox(),
+                      const SizedBox(height: 10),
+                      const Padding(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                        child: Text(
+                          'Помощь',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: ProjectColors.kDarkGreen,
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: _launchCall,
+                        child: const _MenuWidgetRow(
+                          menuRowData: MenuRowData(Icons.call, '+77470470363'),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: _launchEmailApp,
+                        child: const _MenuWidgetRow(
+                          menuRowData:
+                              MenuRowData(Icons.email, 'support@uide.com'),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const QuestionsAboutRowItemWidget(),
+                      const PrivacyPolicyRowItemWidget(),
+                      const SizedBox(height: 80)
+                    ],
+                  )
+                : const Center(
+                    child: CircularProgressIndicator(),
+                  )),
       ),
     );
   }
 }
 
 class _UserInfo extends StatelessWidget {
-  const _UserInfo();
+  final UserProfileModel model;
+  const _UserInfo({required this.model});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       color: ProjectColors.kTransparent,
       width: double.infinity,
-      child: const Center(
+      child: Center(
         child: Column(
           children: [
-            SizedBox(height: 20),
-            _AvatarWidget(),
-            SizedBox(height: 30),
-            _UserNameWidget(),
-            SizedBox(height: 10),
-            _UserPhoneWidget(),
-            SizedBox(height: 10),
-            _UserNickWidget(),
+            const SizedBox(height: 20),
+            _AvatarWidget(
+              model: model,
+            ),
+            const SizedBox(height: 30),
+            _UserNameWidget(model: model),
+            const SizedBox(height: 10),
+            _UserPhoneWidget(model: model),
+            const SizedBox(height: 10),
+            // const _UserNickWidget(),
           ],
         ),
       ),
@@ -241,6 +279,28 @@ class SavedRoomsRowItemWidget extends StatelessWidget {
       onTap: () => Navigator.pushNamed(
         context,
         MainNavigationRouteNames.savedRoomsList,
+      ),
+    );
+  }
+}
+
+class AdminRowItemWidget extends StatelessWidget {
+  const AdminRowItemWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      child: const _MenuWidgetRow(
+        menuRowData: MenuRowData(
+          Icons.admin_panel_settings,
+          'Админ-панель',
+        ),
+      ),
+      onTap: () => Navigator.pushNamed(
+        context,
+        MainNavigationRouteNames.adminScreen,
       ),
     );
   }
@@ -394,13 +454,15 @@ class _UserNickWidgetState extends State<_UserNickWidget> {
 }
 
 class _UserPhoneWidget extends StatelessWidget {
-  const _UserPhoneWidget();
+  final UserProfileModel model;
+
+  const _UserPhoneWidget({required this.model});
 
   @override
   Widget build(BuildContext context) {
-    return const Text(
-      '+7(747)047 03 63',
-      style: TextStyle(
+    return Text(
+      model.userProfileResponse!.phoneNumber ?? '',
+      style: const TextStyle(
         color: Colors.grey,
         fontSize: 13,
       ),
@@ -409,13 +471,14 @@ class _UserPhoneWidget extends StatelessWidget {
 }
 
 class _UserNameWidget extends StatelessWidget {
-  const _UserNameWidget();
+  final UserProfileModel? model;
+  const _UserNameWidget({required this.model});
 
   @override
   Widget build(BuildContext context) {
-    return const Text(
-      'Даулет Тусупбаев',
-      style: TextStyle(
+    return Text(
+      model!.userProfileResponse!.email ?? '',
+      style: const TextStyle(
         color: ProjectColors.kWhite,
         fontSize: 22,
         fontWeight: FontWeight.w500,
@@ -425,14 +488,43 @@ class _UserNameWidget extends StatelessWidget {
 }
 
 class _AvatarWidget extends StatelessWidget {
-  const _AvatarWidget();
+  final UserProfileModel? model;
+  const _AvatarWidget({required this.model});
 
   @override
   Widget build(BuildContext context) {
-    return const LongPressZoomImage(
-      imageUrl: Images.userAvatar,
-      height: 200,
+    return SizedBox(
       width: 200,
+      height: 150,
+      child: Stack(
+        alignment: AlignmentDirectional.center,
+        children: [
+          LongPressZoomImage(
+            isNetworkImage: true,
+            imageUrl: Images.avatarPlaceholder,
+            height: 150,
+            width: 150,
+            model: model,
+            onRetryPressed: model!.reloadConnectivityWidget,
+          ),
+          Positioned(
+            top: 10,
+            right: 0,
+            child: TextButton(
+              onPressed: () {
+                model!.createImageUrl;
+              },
+              child: const Text(
+                'Изм.',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          )
+        ],
+      ),
     );
   }
 }

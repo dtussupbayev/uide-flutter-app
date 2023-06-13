@@ -75,7 +75,7 @@ class QuestionTile extends StatefulWidget {
   const QuestionTile({super.key, required this.question, required this.answer});
 
   @override
-  _QuestionTileState createState() => _QuestionTileState();
+  State<QuestionTile> createState() => _QuestionTileState();
 }
 
 class _QuestionTileState extends State<QuestionTile> {

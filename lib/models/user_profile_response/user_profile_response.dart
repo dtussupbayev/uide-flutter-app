@@ -1,22 +1,24 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'user_profile.g.dart';
+import 'hobby.dart';
+
+part 'user_profile_response.g.dart';
 
 @JsonSerializable()
-class UserProfile {
+class UserProfileResponse {
   String? id;
   String? email;
   String? createdAt;
-  dynamic photo;
-  List<dynamic>? hobbies;
+  String? photo;
+  List<Hobby>? hobbies;
   List<dynamic>? socialMediaProfiles;
-  dynamic description;
+  String? description;
   String? phoneNumber;
-  dynamic role;
+  String? role;
   String? gender;
   bool? active;
 
-  UserProfile({
+  UserProfileResponse({
     this.id,
     this.email,
     this.createdAt,
@@ -30,9 +32,9 @@ class UserProfile {
     this.active,
   });
 
-  factory UserProfile.fromJson(Map<String, dynamic> json) {
-    return _$UserProfileFromJson(json);
+  factory UserProfileResponse.fromJson(Map<String, dynamic> json) {
+    return _$UserProfileResponseFromJson(json);
   }
 
-  Map<String, dynamic> toJson() => _$UserProfileToJson(this);
+  Map<String, dynamic> toJson() => _$UserProfileResponseToJson(this);
 }

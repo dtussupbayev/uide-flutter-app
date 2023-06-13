@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:uide/navigation/main_navigation.dart';
-
-import '../ui/theme/project_colors.dart';
+import 'package:uide/ui/navigation/main_navigation.dart';
+import 'package:uide/ui/theme/project_colors.dart';
 
 class HaveAnAccountSignInWidget extends StatelessWidget {
   const HaveAnAccountSignInWidget({super.key});

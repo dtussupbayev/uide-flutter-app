@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:uide/domain/api_client/api_client.dart';
 import 'package:uide/domain/data_provider/token_data_provider.dart';
-import 'package:uide/navigation/main_navigation.dart';
+import 'package:uide/ui/navigation/main_navigation.dart';
 import 'package:uide/ui/theme/project_colors.dart';
 import 'package:http/http.dart' as http;
 import 'package:uide/ui/widgets/app/main.dart';
@@ -25,7 +25,6 @@ class AuthModel extends ChangeNotifier {
   }
 
   Future<void> auth(BuildContext context) async {
-    print('auth');
     final email = emailController.text;
     final password = passwordController.text;
     notifyListeners();
@@ -40,11 +39,12 @@ class AuthModel extends ChangeNotifier {
           ));
         });
 
-    http.Response response = await _apiClient.auth(
+    http.Response? response = await _apiClient.auth(
       email: email,
       password: password,
+      context: context,
     );
-    final json = await jsonDecode(response.body);
+    final json = await jsonDecode(response!.body);
 
     if (response.statusCode == 200) {
       token = await json['token'] as String?;

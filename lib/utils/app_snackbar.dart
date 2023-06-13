@@ -13,7 +13,7 @@ class AppSnackBar {
           fontWeight: FontWeight.bold,
         ),
       ),
-      duration: const Duration(seconds: 6),
+      duration: const Duration(seconds: 2),
       behavior: SnackBarBehavior.floating,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(

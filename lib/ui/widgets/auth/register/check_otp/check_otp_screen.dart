@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:uide/ui/provider/project_provider.dart';
 
 import 'package:uide/ui/theme/project_colors.dart';
+import 'package:uide/ui/theme/project_styles.dart';
 import 'package:uide/ui/widgets/auth/auth_data.dart';
 import 'package:uide/ui/widgets/auth/register/check_otp/check_otp_model.dart';
 import 'package:uide/utils/header_widget.dart';
 import 'package:uide/utils/have_an_account_sign_in.dart';
-
-import '../../../../../provider/project_provider.dart';
-import '../../../../theme/project_styles.dart';
 
 class CheckOtpScreen extends StatefulWidget {
   const CheckOtpScreen({super.key});
@@ -24,6 +23,9 @@ class _CheckOtpScreenState extends State<CheckOtpScreen> {
     final arguments =
         ModalRoute.of(context)!.settings.arguments as UserAuthData;
     const pageColor = ProjectColors.kDarkerLightGreen;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       body: SafeArea(
         top: false,
@@ -33,7 +35,9 @@ class _CheckOtpScreenState extends State<CheckOtpScreen> {
             child: IntrinsicHeight(
               child: Column(
                 children: [
-                  const HeaderWidget(),
+                  HeaderWidget(
+                    height: screenHeight * 0.23,
+                  ),
                   DecoratedBox(
                     decoration: const BoxDecoration(
                         color: ProjectColors.kWhite,
@@ -114,9 +118,6 @@ class _CheckOtpScreenState extends State<CheckOtpScreen> {
                                                         model.otpDigit4.text;
                                                 model.validateOtp(arguments,
                                                     otpCode, context);
-
-                                                // _validateOtp(
-                                                //     emailOfUser, otpCode);
                                               }
                                             },
                                       style: kElevatedButtonPrimary,
@@ -170,11 +171,10 @@ class _CheckOtpScreenState extends State<CheckOtpScreen> {
   }
 }
 
-// ignore: must_be_immutable
 class InputNumberOTPWidget extends StatefulWidget {
-  TextEditingController otpConroller;
-  int digitPosition;
-  InputNumberOTPWidget(
+  final TextEditingController otpConroller;
+  final int digitPosition;
+  const InputNumberOTPWidget(
       {super.key, required this.otpConroller, required this.digitPosition});
 
   @override

@@ -1,12 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:uide/navigation/main_navigation.dart';
-import 'package:uide/provider/project_provider.dart';
+import 'package:uide/ui/navigation/main_navigation.dart';
+import 'package:uide/ui/provider/project_provider.dart';
+import 'package:uide/ui/theme/project_colors.dart';
+import 'package:uide/ui/theme/project_styles.dart';
 import 'package:uide/ui/widgets/auth/auth_data.dart';
 import 'package:uide/ui/widgets/auth/register/create_password/create_password_model.dart';
 import 'package:uide/utils/header_widget.dart';
-
-import '../../../../theme/project_styles.dart';
-import '../../../../theme/project_colors.dart';
 
 class CreatePasswordScreenWidget extends StatefulWidget {
   const CreatePasswordScreenWidget({super.key});
@@ -25,32 +25,6 @@ class _CreatePasswordScreenWidgetState
 
   final bool _isLoading = false;
 
-  // Future<void> register(email) async {
-  //     final headers = {'Content-Type': 'application/json'};
-  //     final url =
-  //         Uri.parse(ApiEndPoints.baseurl + ApiEndPoints.authEndPoints.signUp);
-  //     final Map body = {
-  //       'email': email,
-  //       'password': _passwordController.text,
-  //     };
-
-  //     setState(() {
-  //       _isLoading = true;
-  //     });
-
-  //     http.Response response =
-  //         await http.post(url, body: jsonEncode(body), headers: headers);
-
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-
-  //     if (response.statusCode == 200) {
-  //     } else {
-  //       // registration failed, show error message
-  //     }
-  //   }
-
   @override
   Widget build(BuildContext context) {
     final arguments =
@@ -58,6 +32,9 @@ class _CreatePasswordScreenWidgetState
     final model = ProjectNotifierProvider.watch<CreatePasswordModel>(context);
 
     const pageColor = ProjectColors.kDarkerLightGreen;
+
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       body: SafeArea(
@@ -70,7 +47,9 @@ class _CreatePasswordScreenWidgetState
             child: IntrinsicHeight(
               child: Column(
                 children: [
-                  const HeaderWidget(),
+                  HeaderWidget(
+                    height: screenHeight * 0.23,
+                  ),
                   DecoratedBox(
                     decoration: const BoxDecoration(
                       borderRadius: BorderRadius.only(
@@ -102,6 +81,7 @@ class _CreatePasswordScreenWidgetState
                                 ),
                                 const SizedBox(height: 30),
                                 TextFormField(
+                                  textInputAction: TextInputAction.next,
                                   controller: model?.passwordController,
                                   obscureText: !_showPassword,
                                   decoration: InputDecoration(
@@ -164,7 +144,9 @@ class _CreatePasswordScreenWidgetState
                                       return 'Пожалуйста, подтвердите свой пароль';
                                     } else if (value !=
                                         model?.passwordController.text) {
-                                      print(model?.passwordController.text);
+                                      if (kDebugMode) {
+                                        print(model?.passwordController.text);
+                                      }
                                       return 'Пароли не совпадают';
                                     }
                                     return null;

@@ -4,11 +4,17 @@ import 'package:uide/ui/theme/project_styles.dart';
 
 class SearchBarWidget extends StatefulWidget {
   final String? hint;
+  final Function(String)? onSearch;
+  final VoidCallback? onToggleFilter;
+  final bool ifHideFilterIcon;
 
   const SearchBarWidget({
-    super.key,
+    Key? key,
     required this.hint,
-  });
+    this.onSearch,
+    this.onToggleFilter,
+    this.ifHideFilterIcon = false,
+  }) : super(key: key);
 
   @override
   State<SearchBarWidget> createState() => _SearchBarWidgetState();
@@ -20,7 +26,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: kRoomListPadding,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         children: [
           Expanded(
@@ -35,7 +41,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                     color: ProjectColors.kWhite.withOpacity(0.7),
                   ),
                   controller: searchController,
-                  onChanged: (String text) {},
+                  onChanged: widget.onSearch,
                   decoration: kDefaultInputDecoration.copyWith(
                     hintText: widget.hint,
                     prefixIcon: const IconTheme(
@@ -52,21 +58,28 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                               Icons.clear,
                               color: ProjectColors.kWhite,
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              searchController.clear();
+                              widget.onSearch?.call('');
+                            },
                           ),
                   ),
                 ),
               ),
             ),
           ),
-          const SizedBox(
-            height: kFilterIconSize,
-            width: kFilterIconSize,
-            child: Icon(
-              Icons.filter_list_rounded,
-              color: ProjectColors.kWhite,
-            ),
-          )
+          widget.ifHideFilterIcon
+              ? SizedBox.shrink()
+              : SizedBox(
+                  height: kFilterIconSize,
+                  width: kFilterIconSize,
+                  child: IconButton(
+                      icon: const Icon(
+                        Icons.filter_list_rounded,
+                        color: ProjectColors.kWhite,
+                      ),
+                      onPressed: widget.onToggleFilter),
+                )
         ],
       ),
     );

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:uide/domain/api_client/api_client.dart';
-import 'package:uide/domain/models/house_details_response/house_details_response.dart';
-import 'package:uide/domain/models/house_details_response/photo.dart';
-import 'package:uide/domain/models/house_entity/house_entity.dart';
+import 'package:uide/models/house_details_response/house_details_response.dart';
+import 'package:uide/models/house_details_response/photo.dart';
+import 'package:uide/models/house_list_entity_response/house_entity.dart';
 
 class HouseDetailsModel extends ChangeNotifier {
   final _apiClient = ApiClient();
 
-  final String houseId;
+  final String? houseId;
   HouseDetailsResponse? _houseDetails;
   bool? _isSaved;
 
@@ -18,8 +18,11 @@ class HouseDetailsModel extends ChangeNotifier {
   HouseDetailsModel(this.houseId);
 
   Future<void> loadDetails(BuildContext context) async {
-    _houseDetails = await _apiClient.houseDetails(houseId, context);
-    if(context.mounted) await checkIsSaved(houseId, context);
+    _houseDetails = await _apiClient.houseDetails(
+        houseId ?? '2c9180de88ab97520188adf0c53d0013', context);
+    if (context.mounted)
+      await checkIsSaved(
+          houseId ?? '2c9180de88ab97520188adf0c53d0013', context);
     notifyListeners();
   }
 
@@ -38,7 +41,7 @@ class HouseDetailsModel extends ChangeNotifier {
   }
 
   Future<void> addToSaved(String houseId, BuildContext context) async {
-    _apiClient.addToSaved(houseId: houseId);
+    _apiClient.addToSaved(houseId: houseId, context: context);
 
     _isSaved = true;
     notifyListeners();

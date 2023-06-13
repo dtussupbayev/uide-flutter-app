@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:uide/domain/api_client/api_client.dart';
-import 'package:uide/navigation/main_navigation.dart';
+import 'package:uide/ui/navigation/main_navigation.dart';
 import 'package:uide/ui/widgets/auth/auth_data.dart';
 import 'package:uide/utils/app_snackbar.dart';
 
@@ -28,12 +28,12 @@ class CheckOtpModel extends ChangeNotifier {
         'email': arguments.email,
         'code': otpCode,
       },
+      context: context,
     );
     isLoading = false;
     notifyListeners();
 
-    if (response.statusCode == 200) {
-      print(response.body);
+    if (response!.statusCode == 200) {
       if (response.body == 'true') {
         if (context.mounted) {
           Navigator.pushNamed(

@@ -1,8 +1,8 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:uide/provider/connectivity_provider.dart';
-import 'package:uide/provider/project_provider.dart';
+import 'package:uide/ui/provider/connectivity_provider.dart';
+import 'package:uide/ui/provider/project_provider.dart';
 import 'package:uide/utils/connection_none_screen.dart';
 import 'package:uide/utils/waiting_screen.dart';
 
@@ -18,10 +18,10 @@ class ConnectivityCheckWidget extends StatefulWidget {
 
   @override
   State<ConnectivityCheckWidget> createState() =>
-      _ConnectivityCheckWidgetState();
+      ConnectivityCheckWidgetState();
 }
 
-class _ConnectivityCheckWidgetState extends State<ConnectivityCheckWidget> {
+class ConnectivityCheckWidgetState extends State<ConnectivityCheckWidget> {
   bool retrying = false;
   late Future<ConnectivityResult> connectivityFuture;
 
@@ -39,9 +39,11 @@ class _ConnectivityCheckWidgetState extends State<ConnectivityCheckWidget> {
   }
 
   Future<void> retryConnectivity() async {
-    setState(() {
-      retrying = true;
-    });
+    if (mounted) {
+      setState(() {
+        retrying = true;
+      });
+    }
     final connectivityProvider =
         Provider.of<ConnectivityProvider>(context, listen: false);
     connectivityFuture = connectivityProvider.fetchConnectivityResult();

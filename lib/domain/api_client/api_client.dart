@@ -1,15 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:uide/domain/api_endpoints.dart';
 import 'package:uide/domain/data_provider/token_data_provider.dart';
-import 'package:uide/domain/models/house_details_response/house_details_response.dart';
-import 'package:uide/domain/models/house_entity/all_house_response.dart';
-import 'package:uide/domain/models/house_entity/house_entity.dart';
-import 'package:uide/domain/models/user_profile/user_profile.dart';
-import 'package:uide/navigation/main_navigation.dart';
+import 'package:uide/models/filters_response/filters_response.dart';
+import 'package:uide/models/house_details_response/house_details_response.dart';
+import 'package:uide/models/house_list_entity_response/all_house_response.dart';
+import 'package:uide/models/house_list_entity_response/house_entity.dart';
+import 'package:uide/models/payload/payload.dart';
+import 'package:uide/models/user_profile_response/user_profile_response.dart';
+import 'package:uide/ui/navigation/main_navigation.dart';
 import 'package:uide/ui/widgets/app/main.dart';
 import 'package:uide/ui/widgets/auth/auth_data.dart';
-import '../api_endpoints.dart';
 import 'package:http/http.dart' as http;
 
 enum ApiClientExceptionType { network, auth, other }
@@ -27,17 +30,34 @@ class ApiClient {
     BuildContext context,
   ) async {
     final token = await TokenDataProvider().getToken();
-
+    final encodedPayload = token!.split('.')[1];
+    final payloadData =
+        utf8.fuse(base64).decode(base64.normalize(encodedPayload));
+    print(payloadData);
+    final payload = Payload.fromJson(jsonDecode(payloadData));
+    print(payload.role);
     var headers = {'Authorization': 'Bearer $token'};
     try {
       final response = await http.get(
         Uri.parse(ApiEndPoints.baseUrl + path),
         headers: headers,
       );
+      if (kDebugMode) {
+        print(response.body);
+      }
       if (response.statusCode == 200) {
         final dynamic json = jsonDecode(utf8.decode(response.bodyBytes));
+        if (kDebugMode) {
+          print('json: $json');
+        }
+
         final result = parser(json);
+        print('parsed result: $result');
         return result;
+      } else if (response.statusCode == 500) {
+        print(response.statusCode);
+        print(response.body);
+        return null;
       } else if (response.statusCode == 401) {
         TokenDataProvider().deleteAll();
         if (context.mounted) {
@@ -47,14 +67,8 @@ class ApiClient {
         }
         return null;
       } else {
-        TokenDataProvider().deleteAll();
-
-        if (context.mounted) {
-          RestartWidget.restartApp(context);
-
-          Navigator.of(context).pushNamedAndRemoveUntil(
-              MainNavigationRouteNames.authScreen, (route) => false);
-        }
+        print(response.statusCode);
+        print(response.body);
         return null;
       }
     } catch (e) {
@@ -81,16 +95,14 @@ class ApiClient {
     return null;
   }
 
-  Future<AllHousesResponse?> adminHousesResponse(
-      int page, BuildContext context) async {
+  Future<AllHousesResponse?> adminHousesResponse(BuildContext context) async {
     parser(dynamic json) {
       final jsonMap = json as Map<String, dynamic>;
       final response = AllHousesResponse.fromJson(jsonMap);
       return response;
     }
 
-    final result =
-        await _get('admin/houses?size=2&page=$page', parser, context);
+    final result = await _get('admin/houses?', parser, context);
     return result;
   }
 
@@ -153,28 +165,71 @@ class ApiClient {
   }
 
   Future<AllHousesResponse?> allHousesResponse(
-      int page, BuildContext context) async {
+    int page,
+    BuildContext context, {
+    int? minPrice,
+    int? maxPrice,
+    int? maxValueOfResidence,
+    int? minValueOfResidence,
+  }) async {
     parser(dynamic json) {
       final jsonMap = json as Map<String, dynamic>;
       final response = AllHousesResponse.fromJson(jsonMap);
       return response;
     }
 
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    int determineCrossAxisCount() {
+      if (screenWidth > 1000) {
+        return 4;
+      } else if (screenWidth > 502) {
+        return 2;
+      } else {
+        return 1;
+      }
+    }
+
+    if (minPrice != null &&
+        maxPrice != null &&
+        minValueOfResidence != null &&
+        maxValueOfResidence != null) {
+      final result = await _get(
+          'houses?cityId=${ApiParameters.cityIdAstana}&size=${determineCrossAxisCount()}&page=$page&maxPrice=$maxPrice&minPrice=$minPrice&maxValueOfResidence=$maxValueOfResidence&minValueOfResidence=$minValueOfResidence',
+          parser,
+          context);
+      return result;
+    }
     final result = await _get(
-        'houses?cityId=${ApiParameters.cityIdAstana}&size=2&page=$page',
+        'houses?cityId=${ApiParameters.cityIdAstana}&size=${determineCrossAxisCount()}&page=$page',
         parser,
         context);
     return result;
   }
 
-  Future<UserProfile?> userProfileResponse(BuildContext context) async {
+  Future<UserProfileResponse?> userProfileResponse(BuildContext context) async {
     parser(dynamic json) {
       final jsonMap = json as Map<String, dynamic>;
-      final response = UserProfile.fromJson(jsonMap);
+      final response = UserProfileResponse.fromJson(jsonMap);
+      print('response.email = ${response.email}');
       return response;
     }
 
     final result = await _get('users/profile', parser, context);
+    return result;
+  }
+
+  Future<FiltersResponse?> getFiltersResponse(BuildContext context) async {
+    pars(dynamic json) {
+      final jsonMap = json as Map<String, dynamic>;
+      final response = FiltersResponse.fromJson(jsonMap);
+      print('parsed: $response');
+      return response;
+    }
+
+    final result = await _get(
+        'houses/filters?cityId=${ApiParameters.cityIdAstana}', pars, context);
+    print('getFiltersResponse result: $result');
     return result;
   }
 
@@ -204,26 +259,82 @@ class ApiClient {
     return result;
   }
 
-  Future<http.Response> _post(
+  Future<http.Response?> _post(
     String path,
+    BuildContext context,
     Map<String, dynamic> body, [
     Map<String, String>? headers,
   ]) async {
     final url = Uri.parse(ApiEndPoints.baseUrl + path);
 
-    final response = await http.post(
-      url,
-      body: jsonEncode(body),
-      headers: headers,
-    );
-    print(response.request);
-
-    return response;
+    try {
+      final response = await http.post(
+        url,
+        body: jsonEncode(body),
+        headers: headers,
+      );
+      return response;
+    } catch (e) {
+      (
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Connection Error'),
+            content: const Text('The connection was aborted.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+    return null;
   }
 
-  Future<http.Response> auth({
+  Future<http.Response?> _put(
+    String path,
+    BuildContext context, [
+    Map<String, String>? headers,
+  ]) async {
+    final url = Uri.parse(ApiEndPoints.baseUrl + path);
+
+    try {
+      final response = await http.put(
+        url,
+        headers: headers,
+      );
+      return response;
+    } catch (e) {
+      (
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Connection Error'),
+            content: const Text('The connection was aborted.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+    return null;
+  }
+
+  Future<http.Response?> auth({
     required String email,
     required String password,
+    required BuildContext context,
   }) async {
     const path = AuthEndPoints.signIn;
     final Map<String, dynamic> body = {
@@ -232,14 +343,15 @@ class ApiClient {
     };
     final headers = {'Content-Type': 'application/json'};
 
-    http.Response response = await _post(path, body, headers);
+    http.Response? response = await _post(path, context, body, headers);
 
     return response;
   }
 
-  Future<http.Response> register({
+  Future<http.Response?> register({
     required UserAuthData userAuthData,
     required String password,
+    required BuildContext context,
   }) async {
     const path = AuthEndPoints.signUp;
     final Map<String, dynamic> body = {
@@ -247,34 +359,37 @@ class ApiClient {
       'username': userAuthData.username,
       'gender': userAuthData.sex,
       'phoneNumber': userAuthData.phone,
+      'cityId': userAuthData.cityId,
       'password': password,
     };
 
     final headers = {'Content-Type': 'application/json'};
 
-    http.Response response = await _post(path, body, headers);
+    http.Response? response = await _post(path, context, body, headers);
 
     return response;
   }
 
-  Future<http.Response> sendOtp({
+  Future<http.Response?> sendOtp({
     required Map<String, dynamic> body,
+    required BuildContext context,
   }) async {
     const path = AuthEndPoints.sendOtp;
     final Map<String, String> headers = {'Content-Type': 'application/json'};
 
-    http.Response response = await _post(path, body, headers);
+    http.Response? response = await _post(path, context, body, headers);
 
     return response;
   }
 
-  Future<http.Response> checkOtp({
+  Future<http.Response?> checkOtp({
     required Map<String, dynamic> body,
+    required BuildContext context,
   }) async {
     const path = AuthEndPoints.checkOtp;
     final Map<String, String> headers = {'Content-Type': 'application/json'};
 
-    http.Response response = await _post(path, body, headers);
+    http.Response? response = await _post(path, context, body, headers);
 
     return response;
   }
@@ -292,8 +407,9 @@ class ApiClient {
     required int area,
     required int numberOfRooms,
     required int floor,
+    required BuildContext context,
   }) async {
-    final token = TokenDataProvider().getToken();
+    final token = await TokenDataProvider().getToken();
     const path = HouseEndPoints.createHouse;
     final Map<String, dynamic> body = {
       'typeOfHouse': typeOfHouse,
@@ -315,30 +431,31 @@ class ApiClient {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token'
     };
-    http.Response response = await _post(
-      path,
-      body,
-      headers,
-    );
+    if (context.mounted) {
+      http.Response? response = await _post(
+        path,
+        context,
+        body,
+        headers,
+      );
 
-    if (response.statusCode == 200) {
-      final responseBody = response.body;
-      Map<String, dynamic> jsonData = json.decode(responseBody);
-      String id = jsonData['id'];
-      print(id);
-      print(jsonData);
-      return id;
-    } else {
-      print(response.reasonPhrase);
-      return '0';
+      if (response?.statusCode == 200) {
+        final responseBody = response?.body;
+        Map<String, dynamic> jsonData = json.decode(responseBody!);
+        String id = jsonData['id'];
+        return id;
+      } else {
+        return '0';
+      }
     }
+    return '0';
   }
 
-  Future<http.Response> addToSaved({
+  Future<http.Response?> addToSaved({
     required String houseId,
+    required BuildContext context,
   }) async {
     final token = await TokenDataProvider().getToken();
-    print(token);
 
     const path = HouseEndPoints.savedHouses;
 
@@ -350,16 +467,41 @@ class ApiClient {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token'
     };
-    print(headers);
 
-    http.Response response = await _post(
-      path,
-      body,
-      headers,
-    );
-    print('added');
-    print(response.body);
-    return response;
+    if (context.mounted) {
+      http.Response? response = await _post(
+        path,
+        context,
+        body,
+        headers,
+      );
+      return response;
+    }
+    return null;
+  }
+
+  Future<http.Response?> approveAdAdmin({
+    required String houseId,
+    required BuildContext context,
+  }) async {
+    final token = await TokenDataProvider().getToken();
+
+    final path = 'admin/houses/$houseId/status';
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token'
+    };
+
+    if (context.mounted) {
+      http.Response? response = await _put(
+        path,
+        context,
+        headers,
+      );
+      return response;
+    }
+    return null;
   }
 
   Future<http.Response?> _delete<T>(
@@ -369,24 +511,46 @@ class ApiClient {
     final token = await TokenDataProvider().getToken();
 
     var headers = {'Authorization': 'Bearer $token'};
-    final response = await http.delete(
-      Uri.parse(ApiEndPoints.baseUrl + path),
-      headers: headers,
-    );
-    print(response.body);
-    if (response.statusCode == 200) {
-      return response;
-    } else if (response.statusCode == 401) {
-      TokenDataProvider().deleteAll();
-      if (context.mounted) {
-        RestartWidget.restartApp(context);
-        Navigator.of(context).pushNamedAndRemoveUntil(
-            MainNavigationRouteNames.authScreen, (route) => false);
+    try {
+      final response = await http.delete(
+        Uri.parse(ApiEndPoints.baseUrl + path),
+        headers: headers,
+      );
+      if (response.statusCode == 200) {
+        return response;
+      } else if (response.statusCode == 401) {
+        TokenDataProvider().deleteAll();
+        if (context.mounted) {
+          RestartWidget.restartApp(context);
+          Navigator.of(context).pushNamedAndRemoveUntil(
+              MainNavigationRouteNames.authScreen, (route) => false);
+        }
+        return response;
+      } else {
+        return response;
       }
-      return response;
-    } else {
-      return response;
+    } catch (e) {
+      if (context.mounted) {
+        (
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Connection Error'),
+              content: const Text('The connection was aborted.'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
     }
+    return null;
   }
 
   Future<http.Response?> deleteHouse(

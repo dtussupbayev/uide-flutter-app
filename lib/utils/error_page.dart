@@ -11,7 +11,7 @@ class ErrorPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: ProjectColors.kDarkGreen,
       appBar: AppBar(
-        title: const Text('Error'),
+        title: const Text('Ошибка'),
         backgroundColor: ProjectColors.kLightGreen,
       ),
       body: Center(
@@ -27,7 +27,7 @@ class ErrorPage extends StatelessWidget {
               ),
               const SizedBox(height: 16.0),
               const Text(
-                'Oops! Something went wrong',
+                'Упс! Что-то пошло не так',
                 style: TextStyle(
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold,
@@ -48,7 +48,7 @@ class ErrorPage extends StatelessWidget {
                   Navigator.pop(context);
                 },
                 child: const Text(
-                  'Retry',
+                  'Повторить попытку',
                   style: TextStyle(fontSize: 16.0),
                 ),
               ),

@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 
 import 'package:email_validator/email_validator.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:uide/provider/project_provider.dart';
+import 'package:uide/ui/provider/project_provider.dart';
 import 'package:uide/ui/theme/project_colors.dart';
+import 'package:uide/ui/theme/project_styles.dart';
 import 'package:uide/ui/widgets/auth/register/create_account/create_account_model.dart';
 import 'package:uide/utils/have_an_account_sign_in.dart';
-
-import '../../../../theme/project_styles.dart';
-
-import '../../../../../utils/header_widget.dart';
+import 'package:uide/utils/header_widget.dart';
 
 class CreateAccountScreen extends StatefulWidget {
   const CreateAccountScreen({super.key});
@@ -24,7 +22,13 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   @override
   Widget build(BuildContext context) {
     final model = ProjectNotifierProvider.watch<CreateAccountModel>(context);
+    String? selectedCityValue;
+    String? selectedSexValue;
+
     const pageColor = ProjectColors.kLightGreen;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
@@ -35,7 +39,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
             child: IntrinsicHeight(
               child: Column(
                 children: [
-                  const HeaderWidget(),
+                  HeaderWidget(
+                    height: screenHeight * 0.23,
+                  ),
                   DecoratedBox(
                     decoration: const BoxDecoration(
                         color: ProjectColors.kWhite,
@@ -52,6 +58,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 20.0),
                             child: TextFormField(
+                                textInputAction: TextInputAction.next,
                                 controller: model!.emailController,
                                 decoration: InputDecoration(
                                   hintText: 'Почта',
@@ -121,8 +128,41 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                                   fontWeight: FontWeight.w400,
                                   letterSpacing: 0.15,
                                 ),
+                                hintText: 'Город',
+                              ),
+                              value: selectedCityValue,
+                              items: const [
+                                DropdownMenuItem(
+                                  value: 'Алматы',
+                                  child: Text('Алматы'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'Астана',
+                                  child: Text('Астана'),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                model.addressCityIdController.text =
+                                    value ?? '';
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 12.0),
+                            child: DropdownButtonFormField<String>(
+                              style:
+                                  const TextStyle(color: ProjectColors.kBlack),
+                              decoration: kDefaultInputDecoration.copyWith(
+                                hintStyle: const TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.w400,
+                                  letterSpacing: 0.15,
+                                ),
                                 hintText: 'Пол',
                               ),
+                              value: selectedSexValue,
                               items: const [
                                 DropdownMenuItem(
                                   value: 'MALE',
@@ -134,7 +174,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                                 ),
                               ],
                               onChanged: (value) {
-                                model.selectedSex = value!;
+                                model.selectedSexController.text = value ?? '';
                               },
                             ),
                           ),

@@ -1,5 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:uide/domain/models/house_entity/house_entity.dart';
+import 'package:uide/models/house_list_entity_response/house_entity.dart';
 
 import 'pageable.dart';
 import 'sort.dart';

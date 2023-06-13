@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:provider/provider.dart';
-import 'package:uide/navigation/main_navigation.dart';
-import 'package:uide/provider/connectivity_provider.dart';
+import 'package:uide/ui/navigation/main_navigation.dart';
+import 'package:uide/ui/provider/connectivity_provider.dart';
 import 'package:uide/ui/theme/project_colors.dart';
 import 'main_app_model.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,7 +44,17 @@ class MainApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => ConnectivityProvider(),
       child: GetMaterialApp(
+        builder: (context, child) => ResponsiveBreakpoints.builder(
+          breakpoints: [
+            const Breakpoint(start: 0, end: 450, name: MOBILE),
+            const Breakpoint(start: 451, end: 800, name: TABLET),
+            const Breakpoint(start: 801, end: 1920, name: DESKTOP),
+            const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
+          ],
+          child: child!,
+        ),
         debugShowCheckedModeBanner: false,
+        title: 'Uide - Find Room and Roommates',
         theme: ThemeData(
           fontFamily: 'Montserrat',
           appBarTheme: const AppBarTheme(
@@ -64,7 +75,7 @@ class MyArguments {
 }
 
 class RestartWidget extends StatefulWidget {
-  const RestartWidget({super.key,required this.child});
+  const RestartWidget({super.key, required this.child});
 
   final Widget child;
 

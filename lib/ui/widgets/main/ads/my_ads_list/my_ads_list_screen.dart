@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:transparent_image/transparent_image.dart';
-import 'package:uide/domain/models/house_entity/house_entity.dart';
-import 'package:uide/domain/models/house_entity/photo.dart';
-import 'package:uide/navigation/main_navigation.dart';
+import 'package:uide/models/house_list_entity_response/house_entity.dart';
+import 'package:uide/models/house_list_entity_response/photo.dart';
+import 'package:uide/ui/navigation/main_navigation.dart';
+import 'package:uide/ui/provider/project_provider.dart';
 import 'package:uide/ui/theme/project_colors.dart';
 import 'package:uide/ui/theme/project_styles.dart';
 import 'package:uide/ui/widgets/main/ads/my_ads_list/my_ads_list_model.dart';
-
-import '../../../../../provider/project_provider.dart';
-import '../../../../../utils/search_bar.dart';
+import 'package:uide/utils/search_bar.dart';
 
 class MyAdsScreenWidget extends StatefulWidget {
   const MyAdsScreenWidget({super.key});
@@ -133,9 +132,9 @@ class _MyAdsScreenWidgetState extends State<MyAdsScreenWidget>
                                   itemBuilder: (context, index) =>
                                       Shimmer.fromColors(
                                         baseColor: ProjectColors.kBlack
-                                            .withOpacity(0.6),
-                                        highlightColor: ProjectColors.kBlack
                                             .withOpacity(0.3),
+                                        highlightColor: ProjectColors.kBlack
+                                            .withOpacity(0.1),
                                         child: SizedBox(
                                           width: 350,
                                           height: 350,

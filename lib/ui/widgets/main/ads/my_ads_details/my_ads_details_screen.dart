@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:transparent_image/transparent_image.dart';
-import 'package:uide/domain/models/house_details_response/house_details_response.dart';
-import 'package:uide/provider/project_provider.dart';
+import 'package:uide/models/house_details_response/house_details_response.dart';
+import 'package:uide/ui/provider/project_provider.dart';
 import 'package:uide/ui/theme/project_colors.dart';
+import 'package:uide/ui/theme/project_styles.dart';
 import 'package:uide/ui/widgets/main/ads/my_ads_details/my_ads_details_content.dart';
 import 'package:uide/ui/widgets/main/ads/my_ads_details/my_ads_details_model.dart';
 import 'package:like_button/like_button.dart';
-
-import '../../../../theme/project_styles.dart';
 
 class MyAdsDetailsScreen extends StatefulWidget {
   final String houseId;

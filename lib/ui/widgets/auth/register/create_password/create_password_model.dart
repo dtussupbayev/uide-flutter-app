@@ -5,11 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:uide/domain/api_client/api_client.dart';
 import 'package:uide/domain/data_provider/token_data_provider.dart';
-import 'package:uide/navigation/main_navigation.dart';
+import 'package:uide/ui/navigation/main_navigation.dart';
 import 'package:uide/ui/theme/project_colors.dart';
 import 'package:uide/ui/widgets/auth/auth_data.dart';
 import 'package:uide/utils/app_snackbar.dart';
-import 'package:http/http.dart' as http;
 
 class CreatePasswordModel extends ChangeNotifier {
   final _apiClient = ApiClient();
@@ -34,7 +33,6 @@ class CreatePasswordModel extends ChangeNotifier {
     _isAuthProgress = true;
     notifyListeners();
 
-    String? token;
     showDialog(
         context: context,
         builder: (context) {
@@ -46,55 +44,57 @@ class CreatePasswordModel extends ChangeNotifier {
         });
 
     try {
-      Response registerResponse = await _apiClient.register(
+      Response? registerResponse = await _apiClient.register(
         userAuthData: userAuthData,
         password: password,
+        context: context,
       );
-      
-      if (registerResponse.statusCode == 200) {
-        http.Response response = await _apiClient.auth(
-          email: userAuthData.email!,
-          password: password,
-        );
-        final json = await jsonDecode(response.body);
 
-        if (json['errorCode'] != null) {
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              AppSnackBar.showErrorSnackBar(
-                "Error: ${json['message']}",
-              ),
-            );
-          }
-        }
-
-        final token = await json['token'] as String?;
-
-        _isAuthProgress = false;
-        notifyListeners();
-        if (token == null) {
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              AppSnackBar.showErrorSnackBar(
-                'Пользователь не существует',
-              ),
-            );
-          }
-
-          if (context.mounted) Navigator.pop(context);
-          FocusManager.instance.primaryFocus?.unfocus();
-
-          return notifyListeners();
-        }
-        await _tokenDataProvider.setToken(token);
-
+      if (registerResponse!.statusCode == 200) {
         if (context.mounted) {
-          unawaited(
+          Response? response = await _apiClient.auth(
+            email: userAuthData.email!,
+            password: password,
+            context: context,
+          );
+          final json = await jsonDecode(response!.body);
+
+          if (json['errorCode'] != null) {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                AppSnackBar.showErrorSnackBar(
+                  "Error: ${json['message']}",
+                ),
+              );
+            }
+          }
+
+          final token = await json['token'] as String?;
+
+          _isAuthProgress = false;
+          notifyListeners();
+          if (token == null) {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                AppSnackBar.showErrorSnackBar(
+                  'Пользователь не существует',
+                ),
+              );
+            }
+
+            if (context.mounted) Navigator.pop(context);
+            FocusManager.instance.primaryFocus?.unfocus();
+
+            return notifyListeners();
+          }
+          await _tokenDataProvider.setToken(token);
+
+          if (context.mounted) {
             Navigator.of(context).pushNamedAndRemoveUntil(
               MainNavigationRouteNames.mainScreen,
               (route) => false,
-            ),
-          );
+            );
+          }
         }
       } else {
         if (context.mounted) {
@@ -119,21 +119,6 @@ class CreatePasswordModel extends ChangeNotifier {
       FocusManager.instance.primaryFocus?.unfocus();
 
       return notifyListeners();
-    }
-
-    _isAuthProgress = false;
-
-    notifyListeners();
-    if (context.mounted) Navigator.pop(context);
-
-    notifyListeners();
-    await _tokenDataProvider.setToken(token);
-
-    if (context.mounted) {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        MainNavigationRouteNames.mainScreen,
-        (route) => false,
-      );
     }
   }
 }

@@ -3,7 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:uide/domain/api_client/api_client.dart';
-import 'package:uide/navigation/main_navigation.dart';
+import 'package:uide/ui/navigation/main_navigation.dart';
 import 'package:uide/ui/widgets/auth/auth_data.dart';
 import 'package:uide/utils/app_snackbar.dart';
 import 'package:uide/utils/error_page.dart';
@@ -13,7 +13,10 @@ class CreateAccountModel extends ChangeNotifier {
   final usernameController = TextEditingController();
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
-  String selectedSex = '';
+  final addressCityIdController = TextEditingController();
+  final selectedSexController = TextEditingController();
+
+  String city = '';
 
   bool isLoading = false;
 
@@ -28,16 +31,20 @@ class CreateAccountModel extends ChangeNotifier {
   Future<void> sendOtp(BuildContext context) async {
     isLoading = true;
     notifyListeners();
+    if (addressCityIdController.text == 'Алматы') {
+      city = '2c918118885dfac501885e0b1a110005';
+    } else if (addressCityIdController.text == 'Астана') {
+      city = '2c918118885dfac501885dfcfdf80001';
+    }
+
     final response = await _apiClient.sendOtp(
       body: {
         'email': emailController.text,
-        'username': usernameController.text,
-        'gender': selectedSex,
-        'phoneNumber': phoneController.text,
       },
+      context: context,
     );
     try {
-      if (response.statusCode == 200) {
+      if (response!.statusCode == 200) {
         if (context.mounted) {
           Navigator.pushNamed(
             context,
@@ -45,7 +52,8 @@ class CreateAccountModel extends ChangeNotifier {
             arguments: UserAuthData(
                 email: emailController.text,
                 username: usernameController.text,
-                sex: selectedSex,
+                sex: selectedSexController.text,
+                cityId: city,
                 phone: phoneController.text),
           );
         }

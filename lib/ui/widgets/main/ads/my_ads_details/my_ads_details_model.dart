@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:uide/domain/api_client/api_client.dart';
-import 'package:uide/domain/models/house_details_response/house_details_response.dart';
-import 'package:uide/domain/models/house_details_response/photo.dart';
-import 'package:uide/navigation/main_navigation.dart';
+import 'package:uide/models/house_details_response/house_details_response.dart';
+import 'package:uide/models/house_details_response/photo.dart';
+import 'package:uide/ui/navigation/main_navigation.dart';
 import 'package:uide/ui/theme/project_colors.dart';
 
 class MyAdsDetailsModel extends ChangeNotifier {
